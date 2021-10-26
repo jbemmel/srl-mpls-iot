@@ -1,0 +1,50 @@
+#
+# SRL MPLS IOT lab featuring SROS and VMX
+#
+name: mpls-iot-lab
+
+topology:
+  kinds:
+    srl:
+      # Need IXR D2 or D3 for EVPN/VXLAN support
+      type: ixrd2 # See https://www.nokia.com/networks/products/7250-interconnect-router/
+      image: srl/auto-config-v2:latest
+      extras:
+        srl-agents: [ ../srl-self-organizing/auto-config-agent.yml ]
+      # binds:
+
+    sros:
+      image: vrnetlab/vr-sros:21.7.R2
+      type: sr-1
+      license: ~/sros/SR_OS_VSR_license.txt
+
+    vmx:
+      image: vrnetlab/vr-vmx:21.1R1.11
+
+    linux:
+      image: frr-with-lldp:latest
+
+  nodes:
+    srl1:
+      kind: srl
+      group: dc
+      startup-config: srl-auto.conf.json
+    sros1:
+      kind: sros
+      group: pop
+    vmx1:
+      kind: vr-vmx
+      group: pop
+
+    h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
+
+  links:
+    # SROS and VMX connected
+    - endpoints: ["sros1:e1-1", "vmx1:eth1"]
+
+    # SRL connected to each node
+    - endpoints: ["srl1:e1-1", "sros1:e1-2"]
+    - endpoints: ["srl1:e1-2", "vmx1:eth2"]
+
+    # A host connected to each SRL on e1-3
+    - endpoints: ["srl1:e1-3", "h1:eth1"]
