@@ -10,7 +10,7 @@ topology:
       type: ixrd2 # See https://www.nokia.com/networks/products/7250-interconnect-router/
       image: srl/auto-config-v2:latest
       extras:
-        srl-agents: [ ../srl-self-organizing/auto-config-agent.yml ]
+        srl-agents: [ ~/srl-docter-agent/srl-self-organizing/auto-config-agent.yml ]
       startup-config: configs/srl-auto.cfg.json
       # binds:
 
