@@ -11,6 +11,7 @@ topology:
       image: srl/auto-config-v2:latest
       extras:
         srl-agents: [ ../srl-self-organizing/auto-config-agent.yml ]
+      startup-config: configs/srl-auto.cfg.json
       # binds:
 
     sros:
@@ -25,10 +26,9 @@ topology:
       image: frr-with-lldp:latest
 
   nodes:
-    srl1:
+    spine1:
       kind: srl
       group: dc
-      startup-config: srl-auto.conf.json
     sros1:
       kind: sros
       group: pop
@@ -43,8 +43,8 @@ topology:
     - endpoints: ["sros1:e1-1", "vmx1:eth1"]
 
     # SRL connected to each node
-    - endpoints: ["srl1:e1-1", "sros1:e1-2"]
-    - endpoints: ["srl1:e1-2", "vmx1:eth2"]
+    - endpoints: ["spine1:e1-1", "sros1:e1-2"]
+    - endpoints: ["spine1:e1-2", "vmx1:eth2"]
 
     # A host connected to each SRL on e1-3
-    - endpoints: ["srl1:e1-3", "h1:eth1"]
+    - endpoints: ["spine1:e1-3", "h1:eth1"]
