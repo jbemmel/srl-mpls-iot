@@ -14,12 +14,12 @@ topology:
       startup-config: configs/srl-auto.cfg.json
       # binds:
 
-    sros:
+    vr-sros:
       image: vrnetlab/vr-sros:21.7.R2
       type: sr-1
       license: ~/sros/SR_OS_VSR_license.txt
 
-    vmx:
+    vr-vmx:
       image: vrnetlab/vr-vmx:21.1R1.11
 
     linux:
@@ -30,7 +30,7 @@ topology:
       kind: srl
       group: dc
     sros1:
-      kind: sros
+      kind: vr-sros
       group: pop
     vmx1:
       kind: vr-vmx
