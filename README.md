@@ -24,3 +24,8 @@ This ensures the netbox containers are connected to the Containerlab bridge
 ```
 pip3 install netbox-agent
 ```
+
+To test, register the local server with Netbox (after creating a token):
+```
+python3 -m netbox_agent.cli --register --netbox.url http://localhost:8000 --netbox.token x --update-all
+```
