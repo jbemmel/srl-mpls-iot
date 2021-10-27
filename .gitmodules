@@ -1,3 +1,6 @@
 [submodule "vrnetlab"]
 	path = vrnetlab
 	url = https://github.com/hellt/vrnetlab.git
+[submodule "netbox"]
+	path = netbox
+	url = https://github.com/netbox-community/netbox.git
