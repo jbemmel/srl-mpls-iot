@@ -18,3 +18,9 @@ networks:
 ```
 
 This ensures the netbox containers are connected to the Containerlab bridge
+
+## Populating Netbox
+[Netbox agent](https://github.com/Solvik/netbox-agent) is a Python based tool for automatically populating Netbox with device inventory information.
+```
+pip3 install netbox-agent
+```
