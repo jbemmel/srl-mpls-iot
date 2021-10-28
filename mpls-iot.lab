@@ -11,7 +11,7 @@ topology:
       image: srl/netbox-agent:latest
       extras:
         srl-agents:
-        - ../srl-docter-agent/srl-self-organizing/auto-config-agent.yml
+        - ../srl-self-organizing/auto-config-agent.yml
         - ../srl-netbox-agent/srl-netbox-agent.yml
       startup-config: configs/srl-auto.cfg.json
       # binds:
