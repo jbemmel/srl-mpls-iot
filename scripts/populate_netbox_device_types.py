@@ -6,7 +6,7 @@ import pynetbox
 import glob
 import argparse
 import os
-import settings
+# import settings
 
 counter = Counter(added=0, updated=0, manufacturer=0)
 
@@ -360,26 +360,26 @@ def main():
     cwd = os.getcwd()
     startTime = datetime.now()
 
-    nbUrl = settings.NETBOX_URL
-    nbToken = settings.NETBOX_TOKEN
+    nbUrl = "http://localhost:8000"
+
+    # if settings.IGNORE_SSL_ERRORS:
+    import requests
+    requests.packages.urllib3.disable_warnings()
+    session = requests.Session()
+    session.verify = False
+    nb.http_session = session
+
+    response = session.post(f'{nbUrl}/api/users/tokens/provision/',
+                            json={ "username": "admin", "password": "admin" },
+                            timeout=5 )
+    nbToken = response.json()['key']
     nb = pynetbox.api(nbUrl, token=nbToken)
 
-    if settings.IGNORE_SSL_ERRORS:
-        import requests
-        requests.packages.urllib3.disable_warnings()
-        session = requests.Session()
-        session.verify = False
-        nb.http_session = session
-
-
-    VENDORS = settings.VENDORS
-    REPO_URL = settings.REPO_URL
+    VENDORS = "Nokia"
 
     parser = argparse.ArgumentParser(description='Import Netbox Device Types')
     parser.add_argument('--vendors', nargs='+', default=VENDORS,
                         help="List of vendors to import eg. apc cisco")
-    parser.add_argument('--url', '--git', default=REPO_URL,
-                        help="Git URL with valid Device Type YAML files")
     args = parser.parse_args()
 
     if not args.vendors:
