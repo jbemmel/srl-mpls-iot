@@ -261,6 +261,22 @@
             }
           },
           {
+            "sequence-id": 155,
+            "description": "Accept Netbox API requests",
+            "action": {
+              "accept": {
+
+              }
+            },
+            "match": {
+              "protocol": "tcp",
+              "destination-port": {
+                "operator": "eq",
+                "value": 8000
+              }
+            }
+          },
+          {
             "sequence-id": 160,
             "description": "Accept incoming HTTP(JSON-RPC) when this router initiates the TCP connection",
             "action": {
@@ -273,6 +289,22 @@
               "source-port": {
                 "operator": "eq",
                 "value": 80
+              }
+            }
+          },
+          {
+            "sequence-id": 165,
+            "description": "Accept Netbox API responses",
+            "action": {
+              "accept": {
+
+              }
+            },
+            "match": {
+              "protocol": "tcp",
+              "source-port": {
+                "operator": "eq",
+                "value": 8000
               }
             }
           },
