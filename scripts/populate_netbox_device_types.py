@@ -16,10 +16,10 @@ def slugFormat(name):
 YAML_EXTENSIONS = ['yml', 'yaml']
 
 def getFiles(vendors=None):
-    
+
     files = []
     discoveredVendors = []
-    base_path = './repo/device-types/'
+    base_path = '~/devicetype-library//device-types/'
     if vendors:
         for r, d, f in os.walk(base_path):
             for folder in d:
@@ -96,7 +96,7 @@ def createInterfaces(interfaces, deviceType, nb):
 
     if not need_interfaces:
         return
-    
+
     try:
         ifSuccess = nb.dcim.interface_templates.create(need_interfaces)
         for intf in ifSuccess:
@@ -106,7 +106,7 @@ def createInterfaces(interfaces, deviceType, nb):
             counter.update({'updated': 1})
     except pynetbox.RequestError as e:
         print(e.error)
-    
+
 
 
 def createConsolePorts(consoleports, deviceType, nb):
@@ -123,7 +123,7 @@ def createConsolePorts(consoleports, deviceType, nb):
 
     if not need_consoleports:
         return
-                
+
     try:
         cpSuccess = nb.dcim.console_port_templates.create(need_consoleports)
         for port in cpSuccess:
@@ -142,7 +142,7 @@ def createPowerPorts(powerports, deviceType, nb):
         try:
             ppGet = all_power_ports[powerport["name"]]
             print(f'Power Port Template Exists: {ppGet.name} - '
-                  + f'{ppGet.type} - {ppGet.device_type.id} - {ppGet.id}')            
+                  + f'{ppGet.type} - {ppGet.device_type.id} - {ppGet.id}')
         except KeyError:
             powerport['device_type'] = deviceType
             need_power_ports.append(powerport)
