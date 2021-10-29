@@ -360,7 +360,7 @@ def main():
     cwd = os.getcwd()
     startTime = datetime.now()
 
-    nbUrl = "http://localhost:8000"
+    nbUrl = "http://172.20.20.1:8000"
 
     # if settings.IGNORE_SSL_ERRORS:
     import requests
