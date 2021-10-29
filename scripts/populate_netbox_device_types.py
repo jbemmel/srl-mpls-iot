@@ -367,13 +367,13 @@ def main():
     requests.packages.urllib3.disable_warnings()
     session = requests.Session()
     session.verify = False
-    nb.http_session = session
 
     response = session.post(f'{nbUrl}/api/users/tokens/provision/',
                             json={ "username": "admin", "password": "admin" },
                             timeout=5 )
     nbToken = response.json()['key']
     nb = pynetbox.api(nbUrl, token=nbToken)
+    nb.http_session = session
 
     VENDORS = "Nokia"
 
