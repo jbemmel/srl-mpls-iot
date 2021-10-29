@@ -28,15 +28,15 @@ topology:
       image: frr-with-lldp:latest
 
   nodes:
-    spine1:
+    spine1.dc1:
       kind: srl
-      group: dc
+      group: dc1
     sros1:
       kind: vr-sros
-      group: pop
+      group: pop1
     vmx1:
       kind: vr-vmx
-      group: pop
+      group: pop2
 
     h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
 
