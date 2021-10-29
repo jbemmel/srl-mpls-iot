@@ -19,7 +19,7 @@ def getFiles(vendors=None):
 
     files = []
     discoveredVendors = []
-    base_path = '~/devicetype-library//device-types/'
+    base_path = '/root/devicetype-library//device-types/'
     if vendors:
         for r, d, f in os.walk(base_path):
             for folder in d:
