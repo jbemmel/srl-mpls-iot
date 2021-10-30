@@ -23,7 +23,6 @@ topology:
 
     vr-sros:
       image: vrnetlab/vr-sros:21.7.R2
-      type: sr-1
       license: ~/sros/SR_OS_VSR_license.txt
 
     vr-vmx:
@@ -34,13 +33,22 @@ topology:
 
   nodes:
   #-----------------------------------------------------#
+    core1:
+      kind: vr-sros
+      group: mpls-core
+      type: sr-2
+      config:
+        vars:
+          system_ip: 1.1.1.1
+          as: 65029
+  #-----------------------------------------------------#
     dcgw1:
       kind: vr-sros
       group: dc
       type: sr-1
       config:
         vars:
-          system_ip: 10.0.0.31
+          system_ip: 2.1.2.1
           as: 65030
     #-----------------------------------------------------#
     dcgw2:
@@ -49,37 +57,45 @@ topology:
       type: sr-1
       config:
         vars:
-          system_ip: 10.0.0.32
+          system_ip: 2.1.2.2
           as: 65030
     #-----------------------------------------------------#
     spine1.dc1:
       kind: srl
-      group: dc1
+      group: dc
+      config:
+        vars:
+          system_ip: 2.1.1.1
+          as: 65031
+    #-----------------------------------------------------#
     sros1:
       kind: vr-sros
       group: pop1
-      type: sr-2
+      type: sr-1
       config:
         vars:
-          system_ip: 10.0.0.33
-          as: 65031
+          system_ip: 3.1.2.1
+          as: 65041
     vmx1:
       kind: vr-vmx
       group: pop2
       config:
         vars:
-          system_ip: 10.0.0.34
-          as: 65032
+          system_ip: 4.1.2.1
+          as: 65042
 
     h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
 
   links:
-    # SROS and VMX connected
-    - endpoints: ["sros1:e1-1", "vmx1:eth1"]
+    # Everything connected to core
+    - endpoints: ["core1:eth1", "dcgw1:eth1"]
+    - endpoints: ["core1:eth2", "dcgw2:eth1"]
+    - endpoints: ["core1:eth3", "sros1:eth1"]
+    - endpoints: ["core1:eth4", "vmx1:eth1"]
 
-    # SRL connected to each node
-    - endpoints: ["spine1.dc1:e1-1", "sros1:e1-2"]
-    - endpoints: ["spine1.dc1:e1-2", "vmx1:eth2"]
+    # SRL connected to each DCGW
+    - endpoints: ["spine1.dc1:e1-1", "dcgw1:eth2"]
+    - endpoints: ["spine1.dc1:e1-2", "dcgw2:eth2"]
 
     # A host connected to each SRL on e1-3
     - endpoints: ["spine1.dc1:e1-3", "h1:eth1"]
