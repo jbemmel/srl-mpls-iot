@@ -4,6 +4,11 @@
 name: mpls-iot-lab
 
 topology:
+  defaults:
+    config:
+      vars:
+        overlay_as: 65555 # 32-bit
+#----------------------------------------------------#
   kinds:
     srl:
       # Need IXR D2 or D3 for EVPN/VXLAN support
@@ -28,15 +33,43 @@ topology:
       image: frr-with-lldp:latest
 
   nodes:
+  #-----------------------------------------------------#
+    dcgw1:
+      kind: vr-sros
+      group: dc
+      type: sr-1
+      config:
+        vars:
+          system_ip: 10.0.0.31
+          as: 65030
+    #-----------------------------------------------------#
+    dcgw2:
+      kind: vr-sros
+      group: dc
+      type: sr-1
+      config:
+        vars:
+          system_ip: 10.0.0.32
+          as: 65030
+    #-----------------------------------------------------#
     spine1.dc1:
       kind: srl
       group: dc1
     sros1:
       kind: vr-sros
       group: pop1
+      type: sr-2
+      config:
+        vars:
+          system_ip: 10.0.0.33
+          as: 65031
     vmx1:
       kind: vr-vmx
       group: pop2
+      config:
+        vars:
+          system_ip: 10.0.0.34
+          as: 65032
 
     h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
 
