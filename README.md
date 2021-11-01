@@ -7,6 +7,8 @@ MPLS interop with SROS and VMX
 * Copy Junos VMX .tgz image to vrnetlab/vmx and run 'make' in that directory -> produces vrnetlab/vr-vmx
 * Copy SROS .qcow2 image to vrnetlab/sros and name it like sros-vm-\<release\>.qcow2 -> produces vrnetlab/vr-sros:21.7.R2
 
+[Update Linux kernel to 5.x](https://computingforgeeks.com/install-linux-kernel-5-on-centos-7/)
+
 ## Networking
 Before using docker-compose to bring up netbox, add the following:
 ```
