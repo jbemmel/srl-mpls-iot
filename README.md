@@ -37,6 +37,9 @@ For example: a license file or Python packages
 ```
 guestfish --rw -a ./sros-vm-21.7.R2.qcow2 -m /dev/sda1 copy-in ./sros.license /
 ```
+```
+guestfish --rw -a ./sros-vm-21.7.R2.qcow2 -m /dev/sda1 copy-in /usr/local/lib/python3.6/site-packages/pynetbox / 
+```
 
 # PySROS demo
 SROS can now execute Python scripts, for example:
