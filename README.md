@@ -32,6 +32,12 @@ To test, register the local server with Netbox (after creating a token):
 python3 -m netbox_agent.cli --register --netbox.url http://localhost:8000 --netbox.token x --update-all
 ```
 
+## Adding files to SROS qcow2 image
+For example: a license file or Python packages
+```
+guestfish --rw -a ./sros-vm-21.7.R2.qcow2 -m /dev/sda1 copy-in ./sros.license /
+```
+
 # PySROS demo
 SROS can now execute Python scripts, for example:
 ```
