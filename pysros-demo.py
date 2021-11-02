@@ -5,9 +5,9 @@ from pysros.management import connect
 
 c = connect()
 pysros_ds = c.running.get("/nokia-conf:configure/system/name")
-print( f"/nokia-conf:configure/system/name: {pysros_ds}" )
+print( "/nokia-conf:configure/system/name: {}".format( pysros_ds ) )
 
-print( f"os.environ: {os.environ}" )
+print( "os.environ: {}".format( os.environ ) )
 
 # Be a good netizen
 sys.exit( 0 )
