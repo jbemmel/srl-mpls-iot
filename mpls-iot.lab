@@ -37,7 +37,7 @@ topology:
       kind: vr-sros
       group: mpls-core
       # type: sr-1s  # sr-2s does not work yet
-      type: "cpu=2 ram=4 max_nics=6 chassis=sr-2s slot=A card=xcm-2s slot=1 mda/1=me6-100gb-qsfp28"
+      type: "cpu=2 ram=4 max_nics=6 chassis=sr-2s slot=A card=xcm-2s slot=1 mda/1=s18-100gb-qsfp28"
       config:
         vars:
           system_ip: 1.1.1.1
