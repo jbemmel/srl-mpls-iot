@@ -36,7 +36,7 @@ topology:
     core1:
       kind: vr-sros
       group: mpls-core
-      type: sr-14s  # sr-2s added in vrnetlab, needs different license?
+      type: sr-1s  # sr-2s added in vrnetlab, needs different license?
       # type: "cpu=2 ram=4 max_nics=6 chassis=sr-2s slot=A card=xcm-1s mda/1=s18-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=8 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s xiom/x1=iom-s-3.0t mda/x1/1=ms8-100gb-sfpdd+2-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=18 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s mda/1=s18-100gb-qsfp28"
