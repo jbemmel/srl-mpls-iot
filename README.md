@@ -31,3 +31,20 @@ To test, register the local server with Netbox (after creating a token):
 ```
 python3 -m netbox_agent.cli --register --netbox.url http://localhost:8000 --netbox.token x --update-all
 ```
+
+## Adding files to SROS qcow2 image
+For example: a license file or Python packages
+```
+guestfish --rw -a ./sros-vm-21.7.R2.qcow2 -m /dev/sda1 copy-in ./sros.license /
+```
+```
+guestfish --rw -a ./sros-vm-21.7.R2.qcow2 -m /dev/sda1 copy-in /usr/local/lib/python3.6/site-packages/pynetbox / 
+```
+
+# PySROS demo
+SROS can now execute Python scripts, for example:
+```
+A:admin@dcgw1# pyexec tftp://172.31.255.29/pysros-demo.py
+dcgw1
+```
+The setup uses vrnetlab VMs which run a TFTP server inside the container hosting the SROS VM. Each VM has the same IP
