@@ -54,3 +54,9 @@ For some reason Netbox containers cannot talk to SRL nodes, tcpdump shows checks
 ```
 containerlab tools disable-tx-offload -c netbox-docker_netbox_1
 ```
+
+## gNMI towards SROS nodes
+After configuring AAA profiles following [this snippet](https://github.com/nokia/SROS-grpc-services#user-access-profile-and-authorization), we can make gNMI queries:
+```
+gnmic -a clab-mpls-iot-lab-dcgw1 -u grpc -p super_secret\! -e json_ietf --insecure get --path /
+```
