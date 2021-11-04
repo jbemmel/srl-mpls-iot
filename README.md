@@ -48,3 +48,15 @@ A:admin@dcgw1# pyexec tftp://172.31.255.29/pysros-demo.py
 dcgw1
 ```
 The setup uses vrnetlab VMs which run a TFTP server inside the container hosting the SROS VM. Each VM has the same IP
+
+## Fixing TCP offload
+For some reason Netbox containers cannot talk to SRL nodes, tcpdump shows checksum errors. To fix:
+```
+containerlab tools disable-tx-offload -c netbox-docker_netbox_1
+```
+
+## gNMI towards SROS nodes
+After configuring AAA profiles following [this snippet](https://github.com/nokia/SROS-grpc-services#user-access-profile-and-authorization), we can make gNMI queries:
+```
+gnmic -a clab-mpls-iot-lab-dcgw1 -u grpc -p super_secret\! -e json_ietf --insecure get --path /
+```
