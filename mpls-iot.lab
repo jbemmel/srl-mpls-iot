@@ -95,7 +95,9 @@ topology:
       kind: linux
       image: cloudflare/goflow:latest
       ports:
-      - 4739:4739/udp  # IPFIX default port
+      - 2056:2056/udp  # Type=NetFlowLegacy
+      - 6343:6343/udp  # Type=sFlow
+      - 2055:2055/udp  # NetFlow/IPFIX
       cmd: -kafka=false
       mgmt_ipv4: 172.20.20.100
 
