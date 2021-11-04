@@ -120,5 +120,5 @@ topology:
     # Connect to sFlow connector via spine1 e1-4
     - endpoints: ["spine1.dc1:e1-4","mgmt-net:spine1-e1-4"] # bridged to mgmt
       vars:
-        port: [ethernet-1/4]
+        port: [ethernet-1/4,None]
         clab_link_ip: 172.20.20.99/24
