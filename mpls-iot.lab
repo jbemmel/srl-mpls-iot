@@ -91,6 +91,14 @@ topology:
 
     h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
 
+    flow-collector:
+      kind: linux
+      image: cloudflare/goflow:latest
+      ports:
+      - 4739:4739/udp  # IPFIX default port
+      cmd: -kafka=false
+      mgmt_ipv4: 172.20.20.100
+
   links:
     # Everything connected to core
     - endpoints: ["core1:eth1", "dcgw1:eth1"]
