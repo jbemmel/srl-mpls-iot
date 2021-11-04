@@ -98,8 +98,9 @@ topology:
       - 2056:2056/udp  # Type=NetFlowLegacy
       - 6343:6343/udp  # Type=sFlow
       - 2055:2055/udp  # NetFlow/IPFIX
-      # Send metrics to Prometheus default '/metrics'
-      cmd: -kafka=false -metrics.addr=172.20.20.101:8080 -loglevel=debug
+      - 8080:8080/tcp  # Metrics available for Prometheus scraping, host:container
+                       # default under '/metrics'
+      cmd: -kafka=false -loglevel=debug
       mgmt_ipv4: 172.20.20.100
 
   links:
