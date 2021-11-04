@@ -5,11 +5,20 @@ from pysros.management import connect
 
 
 c = connect()
+
+#
+# Uses Netconf to retrieve SROS YANG model config and/or system state
+#
 pysros_ds = c.running.get("/nokia-conf:configure/system/name")
 print( "/nokia-conf:configure/system/name: %s" % pysros_ds )
 
-print( "sys.version: %s" % sys.version )
-# print( "os.environ: {}".format( os.environ ) )
+print( "sys.version: %s" % sys.version ) # 3.4.0 on SROS 21.7R3
+print( "sys.path: %s" % sys.path ) # [] on SROS 21.7R3
+
+# Import local packages
+sys.path.append( "cf3:\pynetbox" )
+import pynetbox
+print( "PyNetbox imported ok" )
 
 # Be a good netizen
 sys.exit( 0 )
