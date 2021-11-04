@@ -13,10 +13,23 @@
 / network-instance default type default
 / network-instance default interface system0.0
 
-{{/* policy to allow system ip */}}
+{{/* Enable sFlow to collector, note sent via default network-instance */}}
+/ system sflow
+admin-state enable
+sample-rate 10000
+sample-size 256
+collector 1 {
+    collector-address 172.20.20.100
+    network-instance default
+    source-address {{ .system_ip }}
+    port 6343
+}
+
+{{/* policy to allow system ip, also include collector IP */}}
 / routing-policy
 / routing-policy prefix-set system_ip
 / routing-policy prefix-set system_ip prefix {{ .system_ip }}/32 mask-length-range exact
+/ routing-policy prefix-set system_ip prefix 172.20.20.100/32 mask-length-range exact
 / routing-policy policy system_ip
 / routing-policy policy system_ip statement 10
 / routing-policy policy system_ip statement 10 match prefix-set system_ip
@@ -39,8 +52,6 @@
 / network-instance default protocols bgp neighbor {{ ip $link.clab_far.clab_link_ip }} peer-as {{(index $.clab_nodes $link.clab_far.clab_node).as}}
   {{- end }}
 {{- end -}}
-
-
 
 {{/* Overlay Config */}}
 / network-instance default protocols bgp group overlay timers connect-retry 1

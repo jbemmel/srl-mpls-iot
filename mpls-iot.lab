@@ -98,7 +98,8 @@ topology:
       - 2056:2056/udp  # Type=NetFlowLegacy
       - 6343:6343/udp  # Type=sFlow
       - 2055:2055/udp  # NetFlow/IPFIX
-      cmd: -kafka=false
+      # Send metrics to Prometheus default '/metrics'
+      cmd: -kafka=false -metrics.addr=172.20.20.101:8080 -loglevel=debug
       mgmt_ipv4: 172.20.20.100
 
   links:
@@ -114,3 +115,9 @@ topology:
 
     # A host connected to each SRL on e1-3
     - endpoints: ["spine1.dc1:e1-3", "h1:eth1"]
+
+    # Connect to sFlow connector via spine1 e1-4
+    - endpoints: ["spine1.dc1:e1-4","mgmt-net:spine1-e1-4"] # bridged to mgmt
+      vars:
+        port: [ethernet-1/4]
+        clab_link_ip: 172.20.20.99/24
