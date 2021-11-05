@@ -60,3 +60,7 @@ After configuring AAA profiles following [this snippet](https://github.com/nokia
 ```
 gnmic -a clab-mpls-iot-lab-dcgw1 -u grpc -p super_secret\! -e json_ietf --insecure get --path /
 ```
+Similarly, for Junos:
+```
+gnmic -a clab-mpls-iot-lab-vmx1 -u admin -p admin@123 -e json_ietf --insecure get --path /
+```
