@@ -26,6 +26,7 @@ topology:
       license: ~/sros/SR_OS_VSR_license.txt # now also in qcow2
       binds:
       - scripts/pysros-demo.py:/tftpboot/pysros-demo.py
+      - scripts/pysros-populate-netbox.py:/tftpboot/pysros-populate-netbox.py
 
     vr-vmx:
       image: vrnetlab/vr-vmx:21.1R1.11
