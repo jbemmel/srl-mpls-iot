@@ -2,7 +2,8 @@
 import sys
 # import os  # does not work - "no module named 'os'"
 from pysros.management import connect
-import pynetbox
+
+# TODO import pynetbox
 
 c = connect()
 
