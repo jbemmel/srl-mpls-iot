@@ -30,8 +30,8 @@ print( "/nokia-state:state/system/platform: %s" % platform )
 #                     "mda-type": "s36-100gb-qsfp28"
 
 # Read MDA type(s)
-mda_type = c.running.get("/nokia-state:state/card/mda/equipped-type")
-print( "/nokia-state:state/card/mda/equipped-type: %s" % mda_type )
+mda_type = c.running.get("/nokia-state:state/card[slot=1]/mda/equipped-type")
+print( "/nokia-state:state/card[slot=1]/mda/equipped-type: %s" % mda_type )
 
 #
 # Create or update device in Netbox

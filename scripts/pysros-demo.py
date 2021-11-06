@@ -17,7 +17,7 @@ print( "sys.version: %s" % sys.version ) # 3.4.0 on SROS 21.7R3
 print( "sys.path: %s" % sys.path ) # [] on SROS 21.7R3
 
 # Import local packages
-sys.path.append( "cf3:\" )
+sys.path.append( "cf3:/" )
 import pynetbox
 print( "PyNetbox imported ok" )
 
