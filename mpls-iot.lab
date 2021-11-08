@@ -11,8 +11,6 @@ topology:
 #----------------------------------------------------#
   kinds:
     srl:
-      # Need IXR D2 or D3 for EVPN/VXLAN support
-      type: ixrd2 # See https://www.nokia.com/networks/products/7250-interconnect-router/
       image: srl/netbox-agent:latest
       extras:
         srl-agents:
@@ -39,7 +37,7 @@ topology:
     core1:
       kind: vr-sros
       group: mpls-core
-      type: sr-1s  # sr-2s added in vrnetlab, needs different license?
+      type: sr-1s
       # type: "cpu=2 ram=4 max_nics=6 chassis=sr-2s slot=A card=xcm-1s mda/1=s18-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=8 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s xiom/x1=iom-s-3.0t mda/x1/1=ms8-100gb-sfpdd+2-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=18 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s mda/1=s18-100gb-qsfp28"
@@ -47,8 +45,17 @@ topology:
         vars:
           system_ip: 1.1.1.1
           as: 65029
+
+    core2:
+      kind: vr-sros
+      group: mpls-core
+      type: sr-1s
+      config:
+        vars:
+          system_ip: 1.1.1.2
+          as: 65029
   #-----------------------------------------------------#
-    dcgw1:
+    dcgw1.dc1:
       kind: vr-sros
       group: dc
       type: sr-1s
@@ -57,7 +64,7 @@ topology:
           system_ip: 2.1.2.1
           as: 65030
     #-----------------------------------------------------#
-    dcgw2:
+    dcgw2.dc1:
       kind: vr-sros
       group: dc
       type: sr-1s
@@ -68,29 +75,59 @@ topology:
     #-----------------------------------------------------#
     spine1.dc1:
       kind: srl
+      type: ixr6
       group: dc
       config:
         vars:
           system_ip: 2.1.1.1
           as: 65031
+
+    leaf1.dc1:
+      kind: srl
+      # Need IXR D2 or D3 for EVPN/VXLAN support
+      type: ixrd2 # See https://www.nokia.com/networks/products/7250-interconnect-router/
+      group: dc
+      config:
+        vars:
+          system_ip: 2.1.2.1
+          as: 65032
+
+    leaf2.dc1:
+      kind: srl
+      # Need IXR D2 or D3 for EVPN/VXLAN support
+      type: ixrd2 # See https://www.nokia.com/networks/products/7250-interconnect-router/
+      group: dc
+      config:
+        vars:
+          system_ip: 2.1.2.2
+          as: 65033
     #-----------------------------------------------------#
-    sros1:
-      kind: vr-sros
+    vmx1.pop1:
+      kind: vr-vmx
       group: pop1
-      type: sr-1s
       config:
         vars:
           system_ip: 3.1.2.1
-          as: 65041
-    vmx1:
-      kind: vr-vmx
+          as: 65042
+
+    sros1.pop2:
+      kind: vr-sros
       group: pop2
+      type: sr-1s
       config:
         vars:
           system_ip: 4.1.2.1
-          as: 65042
+          as: 65041
 
-    h1: { kind: linux, group: hosts, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
+    # Game servers
+    h1.dc1: { kind: linux, group: game-servers, binds: [ configs/h1/frr.conf:/etc/frr/frr.conf ] }
+    h2.dc1: { kind: linux, group: game-servers, binds: [ configs/h2/frr.conf:/etc/frr/frr.conf ] }
+
+    # Gamers
+    h3.pop1: { kind: linux, group: gamers, binds: [ configs/h3/frr.conf:/etc/frr/frr.conf ] }
+    h4.pop1: { kind: linux, group: gamers, binds: [ configs/h4/frr.conf:/etc/frr/frr.conf ] }
+    h5.pop2: { kind: linux, group: gamers, binds: [ configs/h5/frr.conf:/etc/frr/frr.conf ] }
+    h6.pop2: { kind: linux, group: gamers, binds: [ configs/h6/frr.conf:/etc/frr/frr.conf ] }
 
     flow-collector:
       kind: linux
@@ -105,21 +142,35 @@ topology:
       mgmt_ipv4: 172.20.20.100
 
   links:
-    # Everything connected to core
-    - endpoints: ["core1:eth1", "dcgw1:eth1"]
-    - endpoints: ["core1:eth2", "dcgw2:eth1"]
-    - endpoints: ["core1:eth3", "sros1:eth1"]
-    - endpoints: ["core1:eth4", "vmx1:eth1"]
+    # Everything connected to core nodes
+    - endpoints: ["core1:eth1", "dcgw1.dc1:eth1"]
+    - endpoints: ["core1:eth2", "dcgw2.dc1:eth1"]
+    - endpoints: ["core1:eth3", "vmx1.pop1:eth1"]
+    - endpoints: ["core1:eth4", "sros1.pop2:eth1"]
+    - endpoints: ["core2:eth1", "dcgw1.dc1:eth2"]
+    - endpoints: ["core2:eth2", "dcgw2.dc1:eth2"]
+    - endpoints: ["core2:eth3", "vmx1.pop1:eth2"]
+    - endpoints: ["core2:eth4", "sros1.pop2:eth2"]
 
     # SRL connected to each DCGW
-    - endpoints: ["spine1.dc1:e1-1", "dcgw1:eth2"]
-    - endpoints: ["spine1.dc1:e1-2", "dcgw2:eth2"]
+    - endpoints: ["spine1.dc1:e1-1", "dcgw1.dc1:eth3"]
+    - endpoints: ["spine1.dc1:e1-2", "dcgw2.dc1:eth3"]
 
-    # A host connected to each SRL on e1-3
-    - endpoints: ["spine1.dc1:e1-3", "h1:eth1"]
+    # A game server host connected to each SRL leaf on e1-2
+    - endpoints: ["spine1.dc1:e1-3", "leaf1.dc1:e1-1"]
+    - endpoints: ["spine1.dc1:e1-4", "leaf2.dc1:e1-1"]
+    - endpoints: ["leaf1.dc1:e1-2", "h1.dc1:eth1"]
+    - endpoints: ["leaf2.dc1:e1-2", "h2.dc1:eth1"]
 
-    # Connect to sFlow connector via spine1 e1-4
-    - endpoints: ["spine1.dc1:e1-4","mgmt-net:spine1-e1-4"] # bridged to mgmt
+    # Gamers connected in PoPs
+    - endpoints: ["vmx1.pop1:eth3", "h3.pop1:eth1"]
+    - endpoints: ["vmx1.pop1:eth4", "h4.pop1:eth1"]
+
+    - endpoints: ["sros1.pop2:eth3", "h5.pop2:eth1"]
+    - endpoints: ["sros1.pop2:eth4", "h6.pop2:eth1"]
+
+    # Connect to sFlow connector via spine1 e1-5
+    - endpoints: ["spine1.dc1:e1-5","mgmt-net:spine1-e1-5"] # bridged to mgmt
       vars:
         port: [ethernet-1/4,None]
         clab_link_ip: 172.20.20.99/24
