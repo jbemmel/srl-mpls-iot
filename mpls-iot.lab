@@ -20,7 +20,7 @@ topology:
       # binds:
 
     vr-sros:
-      image: vrnetlab/vr-sros:21.7.R2
+      image: vrnetlab/vr-sros:21.10.R1
       license: ~/sros/SR_OS_VSR_license.txt # now also in qcow2
       binds:
       - scripts/pysros-demo.py:/tftpboot/pysros-demo.py
