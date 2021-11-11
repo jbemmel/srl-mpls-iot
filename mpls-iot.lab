@@ -151,6 +151,7 @@ topology:
     - endpoints: ["core2:eth2", "dcgw2.dc1:eth2"]
     - endpoints: ["core2:eth3", "vmx1.pop1:eth2"]
     - endpoints: ["core2:eth4", "sros1.pop2:eth2"]
+    - endpoints: ["core1:eth5", "core2:eth5"]
 
     # SRL connected to each DCGW
     - endpoints: ["spine1.dc1:e1-1", "dcgw1.dc1:eth3"]
