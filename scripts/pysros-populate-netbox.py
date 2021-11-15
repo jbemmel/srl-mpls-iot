@@ -5,7 +5,14 @@ from pysros.management import connect
 
 # TODO import pynetbox
 
-c = connect()
+credentials = {
+    "host": "clab-mpls-iot-lab-sros1.pop2",
+    "username": "admin",
+    "password": "admin",
+    "port": 830,
+}
+
+c = connect( **credentials )
 
 #
 # Uses Netconf to retrieve SROS YANG model config and/or system state
