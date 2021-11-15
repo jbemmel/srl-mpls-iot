@@ -12,6 +12,7 @@ credentials = {
     "username": "admin",
     "password": "admin",
     "port": 830,
+    "hostkey_verify": False,
 }
 
 c = connect( **credentials )
