@@ -46,6 +46,8 @@ print( "/nokia-state:state/card[slot-number=1]/mda[mda-slot=1]/equipped-type: %s
 cards = c.running.get("/nokia-state:state/card")
 for c in cards:
   print( "All cards? %s" % cards[c] )
+  print( cards[c]['installed-mda-slots'] )
+  print( cards[c]['mda'] )
 
 #
 # Create or update device in Netbox
