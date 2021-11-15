@@ -59,6 +59,8 @@ def createDeviceType(deviceTypeName, portCount, nb):
                   + f'{dt.model} - {dt.id}')
         except pynetbox.RequestError as e:
             print(e.error)
+    else:
+        dev_type = dev_type[0]
 
     createInterfaces(portCount, dev_type.id, nb)
 
