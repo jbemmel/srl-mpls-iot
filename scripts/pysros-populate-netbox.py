@@ -11,6 +11,7 @@ def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
     # Set global HTTP retry strategy
     ####
     from requests.adapters import HTTPAdapter
+    import urllib3
     from urllib3.util import Retry
 
     retry_strategy = Retry(
