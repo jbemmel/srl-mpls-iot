@@ -128,13 +128,13 @@ for cr in cards:
   print( "All cards? %s" % cards[cr] )
   print( cards[cr]['installed-mda-slots'] )
   print( cards[cr]['mda'] )
-  print( cards[cr]['equipped-ports'] )
+  print( cards[cr]['mda'][1]['equipped-ports'] )
 
 #
 # Create or update device in Netbox
 #
 nb = connectNetbox()
-createDeviceType(platform,cards[0]['equipped-ports'],nb)
+createDeviceType(platform,cards[0]['mda'][1]['equipped-ports'],nb)
 
 # Be a good netizen
 sys.exit( 0 )
