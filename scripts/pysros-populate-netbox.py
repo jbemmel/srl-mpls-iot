@@ -135,7 +135,7 @@ for cr in cards:
 # Create or update device in Netbox
 #
 nb = connectNetbox()
-createDeviceType(platform,cards[0]['mda'][1]['equipped-ports'],nb)
+createDeviceType(platform,cards[1]['mda'][1]['equipped-ports'],nb)
 
 # Be a good netizen
 sys.exit( 0 )
