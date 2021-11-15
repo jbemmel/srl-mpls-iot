@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Map this file to /tftpboot/ for vrnet vr-sros VMs to access via tftp
 import sys
 # import os  # does not work - "no module named 'os'"

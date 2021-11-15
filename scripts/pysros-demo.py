@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Map this file to /tftpboot/ for vrnet vr-sros VMs to access via tftp:
 # pyexec tftp://172.31.255.29/pysros-demo.py
 import sys
