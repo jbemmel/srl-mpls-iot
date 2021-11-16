@@ -127,7 +127,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
     if not new_chassis:
        role_site = re.match( "^(\s+)\d+[.](.*)$", device_name )
        if role_site:
-          role_str = role_site.groups()[0]
+          role_str = "edge-router" # role_site.groups()[0]
           role = nb.dcim.device_roles.get(slug=slugFormat(role_str))
           if not role:
              role = nb.dcim.device_roles.create({ 'name': role_str, 'slug': slugFormat(role_str) })
@@ -212,7 +212,7 @@ for cr in cards:
 nb = connectNetbox()
 dev_type_id, platform_id = createDeviceType( str(platform), cards, nb)
 
-hostname = c.running.get("/nokia-conf:configure/system/name")
+hostname = str( c.running.get("/nokia-conf:configure/system/name") )
 print( hostname )
 
 # Due to the way containerlab works, lookup IP using DNS
