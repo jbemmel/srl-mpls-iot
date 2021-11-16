@@ -47,7 +47,7 @@ def createDeviceType(deviceTypeName, portCount, nb):
                   'manufacturer': nokia.id,
                   'napalm_driver': 'sros', 'napalm_args': { 'insecure': True } } ) # skip_verify not used
 
-    dev_type = nb.dcim.device_types.filter(name=deviceTypeName)
+    dev_type = nb.dcim.device_types.get(name=deviceTypeName)
     if not dev_type:
         try:
             dev = {
@@ -60,8 +60,6 @@ def createDeviceType(deviceTypeName, portCount, nb):
                   + f'{dt.model} - {dt.id}')
         except pynetbox.RequestError as e:
             print(e.error)
-    else:
-        dev_type = dev_type[0]
 
     createInterfaces(portCount, dev_type.id, nb)
 
