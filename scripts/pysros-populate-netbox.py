@@ -125,7 +125,7 @@ def createInterfaces(card, mda, portCount, portType, deviceType, nb):
 def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
     new_chassis = nb.dcim.devices.get(name=device_name)
     if not new_chassis:
-       role_site = re.match( "^(\s+)\d+[.](.*)$", device_name )
+       role_site = re.match( "^(\S+)\d+[.](.*)$", device_name )
        if role_site:
           role_str = "edge-router" # role_site.groups()[0]
           role = nb.dcim.device_roles.get(slug=slugFormat(role_str))
