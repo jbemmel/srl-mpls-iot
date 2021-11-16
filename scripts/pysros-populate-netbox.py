@@ -38,7 +38,7 @@ def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
 def slugFormat(name):
     return name.lower().replace(' ', '_')
 
-def createDeviceType(deviceTypeName, portCount, nb):
+def createDeviceType(deviceTypeName, cards, nb):
     nokia = nb.dcim.manufacturers.get(slug='nokia')
     if not nokia:
        nokia = nb.dcim.manufacturers.create({'name': "Nokia", 'slug': "nokia"})
@@ -64,13 +64,16 @@ def createDeviceType(deviceTypeName, portCount, nb):
         except pynetbox.RequestError as e:
             print(e.error)
 
-    createInterfaces(portCount, dev_type.id, nb)
+    for c in cards:
+       for m in cards[c]['mda']:
+          portCount = cards[c]['mda'][m]['equipped-ports']
+          createInterfaces(c, m, portCount, dev_type.id, nb)
 
-def createInterfaces(portCount, deviceType, nb):
+def createInterfaces(card, mda, portCount, deviceType, nb):
     all_interfaces = {str(item): item for item in nb.dcim.interface_templates.filter(devicetype_id=deviceType)}
     need_interfaces = []
     for i in range(1,portCount+1):
-        portname = "1/1/c%d" % i
+        portname = "%d/%d/c%d" % (card,mda,i)
         try:
             ifGet = all_interfaces[portname]
             print(f'Interface Template Exists: {ifGet.name} - {ifGet.type}'
@@ -133,16 +136,15 @@ print( "/nokia-state:state/card[slot-number=1]/mda[mda-slot=1]/equipped-type: %s
 
 cards = c.running.get("/nokia-state:state/card")
 for cr in cards:
-  print( "All cards? %s" % cards[cr] )
   print( cards[cr]['installed-mda-slots'] )
-  print( cards[cr]['mda'] )
-  print( cards[cr]['mda'][1]['equipped-ports'] )
+  for m in cards[cr]['mda']:
+     print( cards[cr]['mda'][m]['equipped-ports'] )
 
 #
 # Create or update device in Netbox
 #
 nb = connectNetbox()
-createDeviceType( str(platform), cards[1]['mda'][1]['equipped-ports'], nb)
+createDeviceType( str(platform), cards, nb)
 
 # Be a good netizen
 sys.exit( 0 )
