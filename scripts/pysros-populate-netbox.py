@@ -6,7 +6,7 @@ from pysros.management import connect
 import pynetbox, requests
 
 # Helper method
-def get_ips_by_dns_lookup(target, port=None):
+def get_ips_by_dns_lookup(target, port=22):
     '''
         this function takes the passed target and optional port and does a dns
         lookup. it returns the ips that it finds to the caller.
@@ -20,11 +20,7 @@ def get_ips_by_dns_lookup(target, port=None):
 
     '''
     import socket
-
-    if not port:
-        port = 443
-
-    return list(map(lambda x: x[4][0], socket.getaddrinfo('{}.'.format(target),port,type=socket.SOCK_STREAM)))
+    return list(map(lambda x: x[4][0], socket.getaddrinfo(target,port,type=socket.SOCK_STREAM)))
 
 def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
 
