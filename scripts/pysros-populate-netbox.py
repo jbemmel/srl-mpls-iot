@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Map this file to /tftpboot/ for vrnet vr-sros VMs to access via tftp
-import sys
+import sys, ipaddress
 from pysros.management import connect
 import pynetbox, requests
 
@@ -202,8 +202,12 @@ hostname = c.running.get("/nokia-conf:configure/system/name")
 print( hostname )
 
 # Due to the way containerlab works, lookup IP using DNS
-mgmt_ip = get_ips_by_dns_lookup( credentials['host'] )
-print( mgmt_ip )
+mgmt_ips = get_ips_by_dns_lookup( credentials['host'] )
+print( mgmt_ips )
+ipv4s = [ ip for ip in mgmt_ips if ipaddress.ip_address(ip).version == 4 ]
+
+if ipv4s:
+   createDeviceInstance( hostname, ipv4s[0], nb )
 
 # Be a good netizen
 sys.exit( 0 )
