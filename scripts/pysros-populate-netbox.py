@@ -74,8 +74,12 @@ def createInterfaces(portCount, deviceType, nb):
             print(f'Interface Template Exists: {ifGet.name} - {ifGet.type}'
                   + f' - {ifGet.device_type.id} - {ifGet.id}')
         except KeyError:
-            interface['device_type'] = deviceType
-            need_interfaces.append(portname)
+            intf = {
+              'name': portname,
+              'type': '400gbase-x-qsfpdd',
+              'device_type': deviceType,
+            }
+            need_interfaces.append(intf)
 
     if not need_interfaces:
         return
