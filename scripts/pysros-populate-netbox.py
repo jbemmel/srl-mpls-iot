@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Map this file to /tftpboot/ for vrnet vr-sros VMs to access via tftp
-import sys, ipaddress
+import sys, ipaddress, re
 from pysros.management import connect
 import pynetbox, requests
 
@@ -90,6 +90,8 @@ def createDeviceType(deviceTypeName, cards, nb):
           print( "Card %d MDA %d: ports %d type=%s => %s" % (c,m,portCount,mdaType,portType) )
           createInterfaces(c, m, portCount, portType, dev_type.id, nb)
 
+    return dev_type.id, platform.id
+
 def createInterfaces(card, mda, portCount, portType, deviceType, nb):
     all_interfaces = {str(item): item for item in nb.dcim.interface_templates.filter(devicetype_id=deviceType)}
     need_interfaces = []
@@ -120,35 +122,47 @@ def createInterfaces(card, mda, portCount, portType, deviceType, nb):
     except pynetbox.RequestError as e:
         print(e.error)
 
-def createDeviceInstance(device_name,mgmt_ipv4,nb):
+def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
     new_chassis = nb.dcim.devices.get(name=device_name)
     if not new_chassis:
-       new_chassis = nb.dcim.devices.create(
-         name=device_name,
-         # See https://github.com/netbox-community/devicetype-library/blob/master/device-types/Nokia/7210-SAS-Sx.yaml
-         device_type=dev_type.id,
-         serial=mac,
-         device_role=role.id,
-         site=site.id, # Cannot be None
-         platform=platform.id, # Optional, used for NAPALM driver too
-         tenant=None,
-         rack=None,
-         tags=[],
-       )
+       role_site = re.match( "^(\s+)\d+[.](.*)$", device_name )
+       if role_site:
+          role_str = role_site.groups()[0]
+          role = nb.dcim.device_roles.get(slug=slugFormat(role_str))
+          if not role:
+             role = nb.dcim.device_roles.create({ 'name': role_str, 'slug': slugFormat(role_str) })
 
-    # Now assign the IP to the mgmt interface
-    mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
-    logging.info( f"mgmt interface: {mgmt}")
-    # ip.assigned_object_id = mgmt.id
-    # ip.assigned_object_type = mgmt.type
-    ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
-    if not ip:
-       ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
-    ip.device = new_chassis.id
-    ip.interface = mgmt.id
-    ip.primary_for_parent = True
-    ip.dns_name = device_name
-    ip.save()
+          site_str = role_site.groups()[1]
+          site = nb.dcim.sites.get(slug=slugFormat(site_str))
+          if not site:
+             site = nb.dcim.sites.create({ 'name': site_str, 'slug': slugFormat(site_str) })
+
+          new_chassis = nb.dcim.devices.create(
+            name=device_name,
+            # See https://github.com/netbox-community/devicetype-library/blob/master/device-types/Nokia/7210-SAS-Sx.yaml
+            device_type=dev_type_id,
+            serial=1234, # TODO system MAC
+            device_role=role.id,
+            site=site.id, # Cannot be None
+            platform=platform_id, # Optional, used for NAPALM driver too
+            tenant=None,
+            rack=None,
+            tags=[],
+          )
+
+          # Now assign the IP to the mgmt interface
+          mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
+          logging.info( f"mgmt interface: {mgmt}")
+          # ip.assigned_object_id = mgmt.id
+          # ip.assigned_object_type = mgmt.type
+          ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
+          if not ip:
+             ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
+          ip.device = new_chassis.id
+          ip.interface = mgmt.id
+          ip.primary_for_parent = True
+          ip.dns_name = device_name
+          ip.save()
 
 credentials = {
     "host": "clab-mpls-iot-lab-sros1.pop2",
@@ -196,7 +210,7 @@ for cr in cards:
 # Create or update device in Netbox
 #
 nb = connectNetbox()
-createDeviceType( str(platform), cards, nb)
+dev_type_id, platform_id = createDeviceType( str(platform), cards, nb)
 
 hostname = c.running.get("/nokia-conf:configure/system/name")
 print( hostname )
@@ -207,7 +221,7 @@ print( mgmt_ips )
 ipv4s = [ ip for ip in mgmt_ips if ipaddress.ip_address(ip).version == 4 ]
 
 if ipv4s:
-   createDeviceInstance( hostname, ipv4s[0], nb )
+   createDeviceInstance( hostname, ipv4s[0], dev_type_id, platform_id, nb )
 
 # Be a good netizen
 sys.exit( 0 )
