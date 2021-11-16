@@ -53,7 +53,7 @@ def createDeviceType(deviceTypeName, portCount, nb):
             dev = {
              'name': deviceTypeName,
              'slug': deviceTypeName.lower(),
-             'manufacturer': nokia.id,
+             'manufacturer': str(nokia.id),
             }
             dev_type = nb.dcim.device_types.create(dev)
             print(f'Device Type Created: {dt.manufacturer.name} - '
