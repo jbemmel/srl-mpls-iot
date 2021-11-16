@@ -184,7 +184,7 @@ createDeviceType( str(platform), cards, nb)
 hostname = c.running.get("/nokia-conf:configure/system/name")
 print( hostname )
 
-mgmt_ip = c.running.get('/nokia-conf:configure/port[portname="A/1"]')
+mgmt_ip = c.running.get('/nokia-conf:configure/port')
 print( mgmt_ip )
 
 # Be a good netizen
