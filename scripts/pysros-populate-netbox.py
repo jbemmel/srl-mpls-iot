@@ -53,7 +53,7 @@ def createDeviceType(deviceTypeName, portCount, nb):
             dev = {
              'name': deviceTypeName,
              'slug': deviceTypeName.lower(),
-             'manufacturer': str(nokia.id),
+             'manufacturer': nokia.id,
             }
             dev_type = nb.dcim.device_types.create(dev)
             print(f'Device Type Created: {dt.manufacturer.name} - '
@@ -141,7 +141,7 @@ for cr in cards:
 # Create or update device in Netbox
 #
 nb = connectNetbox()
-createDeviceType(platform,cards[1]['mda'][1]['equipped-ports'],nb)
+createDeviceType( str(platform), cards[1]['mda'][1]['equipped-ports'], nb)
 
 # Be a good netizen
 sys.exit( 0 )
