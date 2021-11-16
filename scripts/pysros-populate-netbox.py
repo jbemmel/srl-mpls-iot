@@ -161,7 +161,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
                 ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
              ip.device = new_chassis.id
              ip.interface = mgmt.id
-             ip.primary_for_parent = True
+             # ip.primary_for_parent = True cannot do this for mgmt interface
              ip.dns_name = device_name
              ip.save()
           else:
@@ -227,7 +227,7 @@ if ipv4s:
    try:
      createDeviceInstance( hostname, ipv4s[0], dev_type_id, platform_id, nb )
    except Exception as ex:
-     print( ex ) 
+     print( ex )
 
 # Be a good netizen
 sys.exit( 0 )
