@@ -159,11 +159,12 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
              if not ip:
                 ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
-             print( f"IP:{ip}" )
+             print( f"IP:{__repr__(ip)}" )
              ip.device = new_chassis.id
-             ip.status = "active"
-             ip.interface = mgmt.id
-             ip.primary_for_parent = True
+             # ip.status = "active"
+             ip.assigned_object_id = mgmt.id
+             ip.assigned_object_type = "dcim.interface"
+             ip.primary_for_parent = True # "on"
              ip.dns_name = device_name
              ip.save()
           else:
