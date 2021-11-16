@@ -36,9 +36,10 @@ def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
     return nb
 
 def createDeviceType(deviceTypeName, portCount, nb):
-    nokia = nb.dcim.manufacturers.filter(slug='nokia')
+    nokia = nb.dcim.manufacturers.get(slug='nokia')
     if not nokia:
        nokia = nb.dcim.manufacturers.create({'name': "Nokia", 'slug': "nokia"})
+
     platform = nb.dcim.platforms.get(slug='sros')
     if not platform:
        # Uses SRLinux specific NAPALM driver: https://github.com/napalm-automation-community/napalm-srlinux
