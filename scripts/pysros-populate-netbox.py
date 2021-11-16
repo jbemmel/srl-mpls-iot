@@ -5,6 +5,27 @@ import sys
 from pysros.management import connect
 import pynetbox, requests
 
+# Helper method
+def get_ips_by_dns_lookup(target, port=None):
+    '''
+        this function takes the passed target and optional port and does a dns
+        lookup. it returns the ips that it finds to the caller.
+
+        :param target:  the URI that you'd like to get the ip address(es) for
+        :type target:   string
+        :param port:    which port do you want to do the lookup against?
+        :type port:     integer
+        :returns ips:   all of the discovered ips for the target
+        :rtype ips:     list of strings
+
+    '''
+    import socket
+
+    if not port:
+        port = 443
+
+    return list(map(lambda x: x[4][0], socket.getaddrinfo('{}.'.format(target),port,type=socket.SOCK_STREAM)))
+
 def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
 
     ####
@@ -184,7 +205,8 @@ createDeviceType( str(platform), cards, nb)
 hostname = c.running.get("/nokia-conf:configure/system/name")
 print( hostname )
 
-mgmt_ip = c.running.get('/nokia-conf:configure/system/management-interface')
+# Due to the way containerlab works, lookup IP using DNS
+mgmt_ip = get_ips_by_dns_lookup( credentials['host'] )
 print( mgmt_ip )
 
 # Be a good netizen
