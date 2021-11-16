@@ -224,7 +224,10 @@ print( mgmt_ips )
 ipv4s = [ ip for ip in mgmt_ips if ipaddress.ip_address(ip).version == 4 ]
 
 if ipv4s:
-   createDeviceInstance( hostname, ipv4s[0], dev_type_id, platform_id, nb )
+   try:
+     createDeviceInstance( hostname, ipv4s[0], dev_type_id, platform_id, nb )
+   except Exception as ex:
+     print( ex ) 
 
 # Be a good netizen
 sys.exit( 0 )
