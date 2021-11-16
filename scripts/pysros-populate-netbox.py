@@ -64,16 +64,19 @@ def createDeviceType(deviceTypeName, cards, nb):
         except pynetbox.RequestError as e:
             print(e.error)
 
+    createInterfaces(1,None,1,'100base-tx',dev_type.id, nb)
     for c in cards:
        for m in cards[c]['mda']:
           portCount = cards[c]['mda'][m]['equipped-ports']
-          createInterfaces(c, m, portCount, dev_type.id, nb)
+          mdaType = cards[c]['mda'][m]['equipped-type']
+          portType = "100gbase-x-qsfp28" if 'qsfp' in mdaType else '400gbase-x-qsfpdd'
+          createInterfaces(c, m, portCount, portType, dev_type.id, nb)
 
-def createInterfaces(card, mda, portCount, deviceType, nb):
+def createInterfaces(card, mda, portCount, portType, deviceType, nb):
     all_interfaces = {str(item): item for item in nb.dcim.interface_templates.filter(devicetype_id=deviceType)}
     need_interfaces = []
     for i in range(1,portCount+1):
-        portname = "%d/%d/c%d" % (card,mda,i)
+        portname = "%d/%d/c%d" % (card,mda,i) if mda else "A/1"
         try:
             ifGet = all_interfaces[portname]
             print(f'Interface Template Exists: {ifGet.name} - {ifGet.type}'
@@ -81,8 +84,9 @@ def createInterfaces(card, mda, portCount, deviceType, nb):
         except KeyError:
             intf = {
               'name': portname,
-              'type': '400gbase-x-qsfpdd',
+              'type': portType,
               'device_type': deviceType,
+              'mgmt_only': not mda
             }
             need_interfaces.append(intf)
 
