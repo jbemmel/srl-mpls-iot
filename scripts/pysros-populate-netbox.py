@@ -103,6 +103,36 @@ def createInterfaces(card, mda, portCount, portType, deviceType, nb):
     except pynetbox.RequestError as e:
         print(e.error)
 
+def createDeviceInstance(device_name,mgmt_ipv4,nb):
+    new_chassis = nb.dcim.devices.get(name=device_name)
+    if not new_chassis:
+       new_chassis = nb.dcim.devices.create(
+         name=device_name,
+         # See https://github.com/netbox-community/devicetype-library/blob/master/device-types/Nokia/7210-SAS-Sx.yaml
+         device_type=dev_type.id,
+         serial=mac,
+         device_role=role.id,
+         site=site.id, # Cannot be None
+         platform=platform.id, # Optional, used for NAPALM driver too
+         tenant=None,
+         rack=None,
+         tags=[],
+       )
+
+    # Now assign the IP to the mgmt interface
+    mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
+    logging.info( f"mgmt interface: {mgmt}")
+    # ip.assigned_object_id = mgmt.id
+    # ip.assigned_object_type = mgmt.type
+    ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
+    if not ip:
+       ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
+    ip.device = new_chassis.id
+    ip.interface = mgmt.id
+    ip.primary_for_parent = True
+    ip.dns_name = device_name
+    ip.save()
+
 credentials = {
     "host": "clab-mpls-iot-lab-sros1.pop2",
     "username": "admin",
@@ -150,6 +180,12 @@ for cr in cards:
 #
 nb = connectNetbox()
 createDeviceType( str(platform), cards, nb)
+
+hostname = c.running.get("/nokia-conf:configure/system/hostname")
+print( hostname )
+
+mgmt_ip = c.running.get("/nokia-conf:configure/port[name=A/1]")
+print( mgmt_ip )
 
 # Be a good netizen
 sys.exit( 0 )
