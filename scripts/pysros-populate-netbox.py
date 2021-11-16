@@ -151,18 +151,21 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
           )
 
           # Now assign the IP to the mgmt interface
-          mgmt = nb.dcim.interfaces.get(name='A/1', device=new_chassis.id)
+          mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
           print( f"mgmt interface: {mgmt}")
           # ip.assigned_object_id = mgmt.id
           # ip.assigned_object_type = mgmt.type
-          ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
-          if not ip:
-             ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
-          ip.device = new_chassis.id
-          ip.interface = mgmt.id
-          ip.primary_for_parent = True
-          ip.dns_name = device_name
-          ip.save()
+          if mgmt:
+             ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
+             if not ip:
+                ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
+             ip.device = new_chassis.id
+             ip.interface = mgmt.id
+             ip.primary_for_parent = True
+             ip.dns_name = device_name
+             ip.save()
+          else:
+             print( "Unable to find A/1 mgmt interface" )
 
 credentials = {
     "host": "clab-mpls-iot-lab-sros1.pop2",
