@@ -67,7 +67,7 @@ def createDeviceType(deviceTypeName, cards, nb):
     createInterfaces(1,None,1,'100base-tx',dev_type.id, nb)
     for c in cards:
        for m in cards[c]['mda']:
-          portCount = cards[c]['mda'][m]['equipped-ports']
+          portCount = int( cards[c]['mda'][m]['equipped-ports'] )
           mdaType = cards[c]['mda'][m]['equipped-type']
           print( "Card %d MDA %d: ports %d type=%s" % (c,m,portCount,mdaType) )
           portType = '100gbase-x-qsfp28' if 'qsfp' in mdaType else '400gbase-x-qsfpdd'
