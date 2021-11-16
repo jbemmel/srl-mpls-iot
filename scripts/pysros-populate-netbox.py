@@ -59,8 +59,8 @@ def createDeviceType(deviceTypeName, portCount, nb):
              'manufacturer': nokia.id,
             }
             dev_type = nb.dcim.device_types.create(dev)
-            print(f'Device Type Created: {dt.manufacturer.name} - '
-                  + f'{dt.model} - {dt.id}')
+            print(f'Device Type Created: {dev_type.manufacturer.name} - '
+                  + f'{dev_type.model} - {dev_type.id}')
         except pynetbox.RequestError as e:
             print(e.error)
 
