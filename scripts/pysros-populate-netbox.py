@@ -90,7 +90,6 @@ def createInterfaces(portCount, deviceType, nb):
             print(f'Interface Template Created: {intf.name} - '
               + f'{intf.type} - {intf.device_type.id} - '
               + f'{intf.id}')
-            counter.update({'updated': 1})
     except pynetbox.RequestError as e:
         print(e.error)
 
