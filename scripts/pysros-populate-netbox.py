@@ -181,7 +181,7 @@ for cr in cards:
 nb = connectNetbox()
 createDeviceType( str(platform), cards, nb)
 
-hostname = c.running.get("/nokia-conf:configure/system/hostname")
+hostname = c.running.get("/nokia-conf:configure/system/name")
 print( hostname )
 
 mgmt_ip = c.running.get("/nokia-conf:configure/port[name=A/1]")
