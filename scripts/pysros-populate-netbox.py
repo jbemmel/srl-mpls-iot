@@ -35,6 +35,9 @@ def connectNetbox(nbUrl = "http://172.20.20.1:8000"):
     nb.http_session = http
     return nb
 
+def slugFormat(name):
+    return name.lower().replace(' ', '_')
+
 def createDeviceType(deviceTypeName, portCount, nb):
     nokia = nb.dcim.manufacturers.get(slug='nokia')
     if not nokia:
@@ -51,8 +54,8 @@ def createDeviceType(deviceTypeName, portCount, nb):
     if not dev_type:
         try:
             dev = {
-             'name': deviceTypeName,
-             'slug': deviceTypeName.lower(),
+             'model': deviceTypeName,
+             'slug': slugFormat(deviceTypeName),
              'manufacturer': nokia.id,
             }
             dev_type = nb.dcim.device_types.create(dev)
