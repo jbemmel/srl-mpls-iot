@@ -149,6 +149,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
             rack=None,
             tags=[],
           )
+          print( dict(new_chassis) )
 
           # Now assign the IP to the mgmt interface
           mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
