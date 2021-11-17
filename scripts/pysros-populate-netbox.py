@@ -168,13 +168,12 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              # ip.device = new_chassis.id
              # # ip.status = "active"
              # ip.interface = mgmt.id
-             ip.assigned_object = mgmt
-             # # ip.assigned_object_id = mgmt.id
-             # # ip.assigned_object_type = "dcim.interface"
+             # ip.assigned_object = mgmt.id
+             ip.assigned_object_id = mgmt.id
+             ip.assigned_object_type = "dcim.interface"
              ip.primary_for_parent = True # "on"
              ip.dns_name = device_name
-             ip.save()
-             print( f"IP updated?? { dict(nb.ipam.ip_addresses.get(address=mgmt_ipv4)) }" )
+             ip.save() # Note: make sure to run latest pynetbox release
           else:
              print( "Unable to find A/1 mgmt interface" )
 
