@@ -123,8 +123,6 @@ def createInterfaces(card, mda, portCount, portType, deviceType, nb):
         print(e.error)
 
 def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
-    new_chassis = nb.dcim.devices.get(name=device_name)
-    if not new_chassis:
        role_site = re.match( "^(\S+)\d+[.](.*)$", device_name )
        if role_site:
           role_str = "edge-router" # role_site.groups()[0]
@@ -137,42 +135,46 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
           if not site:
              site = nb.dcim.sites.create({ 'name': site_str, 'slug': slugFormat(site_str) })
 
-          new_chassis = nb.dcim.devices.create(
-            name=device_name,
-            # See https://github.com/netbox-community/devicetype-library/blob/master/device-types/Nokia/7210-SAS-Sx.yaml
-            device_type=dev_type_id,
-            serial=1234, # TODO system MAC
-            device_role=role.id,
-            site=site.id, # Cannot be None
-            platform=platform_id, # Optional, used for NAPALM driver too
-            tenant=None,
-            rack=None,
-            tags=[],
-          )
+          new_chassis = nb.dcim.devices.get(name=device_name)
+          if not new_chassis:
+             new_chassis = nb.dcim.devices.create(
+              name=device_name,
+              # See https://github.com/netbox-community/devicetype-library/blob/master/device-types/Nokia/7210-SAS-Sx.yaml
+              device_type=dev_type_id,
+              serial=1234, # TODO system MAC
+              device_role=role.id,
+              site=site.id, # Cannot be None
+              platform=platform_id, # Optional, used for NAPALM driver too
+              tenant=None,
+              rack=None,
+              tags=[],
+             )
           print( dict(new_chassis) )
 
           # Now assign the IP to the mgmt interface
           mgmt = nb.dcim.interfaces.get(name='A/1', device=device_name)
-          print( f"mgmt interface: {mgmt}")
+          print( f"mgmt interface: {dict(mgmt)}")
           # ip.assigned_object_id = mgmt.id
           # ip.assigned_object_type = mgmt.type
           if mgmt:
              ip = nb.ipam.ip_addresses.get(address=mgmt_ipv4)
              if not ip:
                 ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
+             print( f"IP:{dict(ip)}" )
 
-             new_chassis.primary_ip = ip.id
-             new_chassis.save()
+             # new_chassis.primary_ip = ip.id
+             # new_chassis.save()
 
-             # ip.device = new_chassis.id
+             ip.device = new_chassis.id
              # # ip.status = "active"
-             # ip.interface = mgmt.id
+             ip.interface = mgmt.id
              # # ip.assigned_object = mgmt.id
              # # ip.assigned_object_id = mgmt.id
              # # ip.assigned_object_type = "dcim.interface"
-             # ip.primary_for_parent = True # "on"
-             # ip.dns_name = device_name
-             # ip.save()
+             ip.primary_for_parent = True # "on"
+             ip.dns_name = device_name
+             ip.save()
+             print( "IP updated??" )
           else:
              print( "Unable to find A/1 mgmt interface" )
 
