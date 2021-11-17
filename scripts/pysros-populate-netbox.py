@@ -165,10 +165,10 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              # new_chassis.primary_ip = ip.id
              # new_chassis.save()
 
-             ip.device = new_chassis.id
+             # ip.device = new_chassis.id
              # # ip.status = "active"
-             ip.interface = mgmt.id
-             # # ip.assigned_object = mgmt.id
+             # ip.interface = mgmt.id
+             ip.assigned_object = mgmt
              # # ip.assigned_object_id = mgmt.id
              # # ip.assigned_object_type = "dcim.interface"
              ip.primary_for_parent = True # "on"
