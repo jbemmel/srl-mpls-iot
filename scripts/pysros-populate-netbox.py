@@ -162,8 +162,9 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              print( f"IP:{ repr(ip) }" )
              ip.device = new_chassis.id
              # ip.status = "active"
-             ip.assigned_object_id = mgmt.id
-             ip.assigned_object_type = "dcim.interface"
+             ip.assigned_object = mgmt.id
+             # ip.assigned_object_id = mgmt.id
+             # ip.assigned_object_type = "dcim.interface"
              ip.primary_for_parent = True # "on"
              ip.dns_name = device_name
              ip.save()
