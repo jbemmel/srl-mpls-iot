@@ -175,6 +175,10 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              ip.dns_name = device_name
              ip.save() # Note: make sure to run latest pynetbox release
              print( f"After:{dict(nb.ipam.ip_addresses.get(address=mgmt_ipv4))}" )
+
+             new_chassis.primary_ip = ip
+             new_chassis.primary_ip4 = ip
+             new_chassis.save()
           else:
              print( "Unable to find A/1 mgmt interface" )
 
