@@ -174,7 +174,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              ip.primary_for_parent = True # "on"
              ip.dns_name = device_name
              ip.save()
-             print( f"IP updated?? { dict(ip) }" )
+             print( f"IP updated?? { dict(nb.ipam.ip_addresses.get(address=mgmt_ipv4)) }" )
           else:
              print( "Unable to find A/1 mgmt interface" )
 
