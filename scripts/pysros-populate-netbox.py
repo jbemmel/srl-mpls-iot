@@ -174,6 +174,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              ip.primary_for_parent = "on"
              ip.dns_name = device_name
              ip.save() # Note: make sure to run latest pynetbox release
+             print( f"After:{dict(nb.ipam.ip_addresses.get(address=mgmt_ipv4))}" )
           else:
              print( "Unable to find A/1 mgmt interface" )
 
