@@ -1,0 +1,23 @@
+#
+# Lab to test distributed SROS VM with SR-2s chassis
+#
+name: test-sr2s-lab
+
+#----------------------------------------------------#
+  kinds:
+    vr-sros:
+      image: vrnetlab/vr-sros:21.10.R1
+      license: ~/sros/SR_OS_VSR_license.txt # now also in qcow2
+      binds:
+      - scripts/pysros-demo.py:/tftpboot/pysros-demo.py
+      - scripts/pysros-populate-netbox.py:/tftpboot/pysros-populate-netbox.py
+
+#-----------------------------------------------------#
+  nodes:
+    test:
+      kind: vr-sros
+      type: sr-2s
+      # These are integrated models, SR-2s requires distributed
+      # type: "cpu=2 ram=4 max_nics=6 slot=A chassis=sr-2s card=xcm-1s mda/1=s18-100gb-qsfp28"
+      # type: "cpu=2 ram=6 max_nics=8 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s xiom/x1=iom-s-3.0t mda/x1/1=ms8-100gb-sfpdd+2-100gb-qsfp28"
+      # type: "cpu=2 ram=6 max_nics=18 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s mda/1=s18-100gb-qsfp28"
