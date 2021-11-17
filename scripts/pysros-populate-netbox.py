@@ -161,7 +161,7 @@ def createDeviceInstance(device_name,mgmt_ipv4,dev_type_id,platform_id,nb):
              if not ip:
                 ip = nb.ipam.ip_addresses.create(address=mgmt_ipv4,dns_name=device_name)
 
-             new_chassis.primary_ip = ip
+             new_chassis.primary_ip = ip.id
              new_chassis.save()
 
              # ip.device = new_chassis.id
