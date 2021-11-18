@@ -34,6 +34,16 @@
 / configure router bgp group underlay export policy system_ip
 {{- end }}
 
+{{- if .isis }}
+{{/* Underlay IGP Config ISIS */}}
+/ configure router "Base" mpls-labels sr-labels start 500000 end 524287
+/ configure router isis 0 advertise-router-capability area
+/ configure router isis 0 segment-routing prefix-sid-range global
+/ configure router isis 0 router-id {{ .system_ip }} segment-routing admin-state enable
+/ configure router isis 0 interface system passive true admin-state enable
+{{- end }}
+
+
 {{/* If the bgp_underlay flag specified under the link then configure underlay ebgp on links */}}
 {{- range $name, $link := .clab_links }}
   {{- if .bgp_underlay }}
