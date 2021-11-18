@@ -64,3 +64,6 @@ Similarly, for Junos:
 ```
 gnmic -a clab-mpls-iot-lab-vmx1 -u admin -p admin@123 -e json_ietf --insecure get --path /
 ```
+
+## Netbox onboarding plugin
+At https://github.com/networktocode/ntc-netbox-plugin-onboarding there is an onboarding plugin that could be added as another means to operationalize SROS devices quickly
