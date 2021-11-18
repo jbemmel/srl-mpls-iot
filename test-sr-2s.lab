@@ -3,21 +3,31 @@
 #
 name: test-sr2s-lab
 
+topology:
 #----------------------------------------------------#
   kinds:
     vr-sros:
       image: vrnetlab/vr-sros:21.10.R1
-      license: ~/sros/SR_OS_VSR_license.txt # now also in qcow2
+      license: ../vrnetlab/sros/SR_OS_VSR-SIM_license.txt # now also in qcow2
       binds:
       - scripts/pysros-demo.py:/tftpboot/pysros-demo.py
       - scripts/pysros-populate-netbox.py:/tftpboot/pysros-populate-netbox.py
 
 #-----------------------------------------------------#
   nodes:
-    test:
+    test-sr1s:
       kind: vr-sros
-      type: sr-2s
+      type: sr-1s
       # These are integrated models, SR-2s requires distributed
       # type: "cpu=2 ram=4 max_nics=6 slot=A chassis=sr-2s card=xcm-1s mda/1=s18-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=8 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s xiom/x1=iom-s-3.0t mda/x1/1=ms8-100gb-sfpdd+2-100gb-qsfp28"
       # type: "cpu=2 ram=6 max_nics=18 slot=A chassis=sr-2s sfm=sfm-2s card=xcm-2s mda/1=s18-100gb-qsfp28"
+
+    test-sr2s:
+      kind: vr-sros
+      type: sr-1s
+      # TiMOS card type 76 (cpm-s), Hw card type 66 (pegasus_r1) is not supported.
+      # type: "cp: cpu=2 ram=4 slot=A chassis=sr-2s sfm=sfm-2s card=cpm-2s ___ lc: cpu=2 ram=4 slot=1 chassis=sr-2s sfm=sfm-2s card=xcm-2s xiom/x1=iom-s-3.0t mda/x1/1=ms8-100gb-sfpdd+2-100gb-qsfp28"
+
+  links:
+  - endpoints: ["test-sr1s:eth1", "test-sr2s:eth1"]

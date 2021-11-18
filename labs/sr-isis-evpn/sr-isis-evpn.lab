@@ -1,0 +1,56 @@
+#
+# Container lab to test 7750 SR/MPLS over ISIS, including EVPN
+#
+name: sr-isis-evpn
+
+topology:
+  defaults:
+    config:
+      vars:
+        overlay_as: 65555 # 32-bit
+#----------------------------------------------------#
+  kinds:
+    vr-sros:
+      image: vrnetlab/vr-sros:21.10.R1
+      type: sr-1s # integrated single VM
+      license: ../../../vrnetlab/sros/SR_OS_VSR-SIM_license.txt
+
+#-----------------------------------------------------#
+  nodes:
+    r1:
+      kind: vr-sros
+      config:
+        vars:
+          system_ip: 1.1.1.1
+          as: 65001
+
+    r2:
+      kind: vr-sros
+      config:
+        vars:
+          system_ip: 2.2.2.2
+          as: 65002
+
+    r3:
+      kind: vr-sros
+      config:
+        vars:
+          system_ip: 3.3.3.3
+          as: 65003
+
+
+  links:
+  - endpoints: ["r1:eth1", "r2:eth1"]
+    vars:
+      port: [1/1/c1,1/1/c1]
+      clab_link_ip: 10.0.0.0/31
+
+  - endpoints: ["r1:eth2", "r3:eth1"]
+    vars:
+      port: [1/1/c2,1/1/c1]
+      clab_link_ip: 10.0.0.2/31
+
+  - endpoints: ["r2:eth2", "r3:eth2"]
+    vars:
+      port: [1/1/c2,1/1/c2]
+      clab_link_ip: 10.0.0.4/31
