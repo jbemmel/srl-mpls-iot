@@ -41,6 +41,10 @@
 / configure router isis 0 segment-routing prefix-sid-range global
 / configure router isis 0 router-id {{ .system_ip }} segment-routing admin-state enable
 / configure router isis 0 interface system passive true admin-state enable
+{{ range $name, $link := .clab_links }}
+/ configure router isis 0 interface {{ $link.clab_link_name }} level-capability 2 interface-type point-to-point admin-state enable
+{{- end }}
+/ configure router isis 0 admin-state enable
 {{- end }}
 
 
@@ -57,7 +61,5 @@
 / configure router bgp group overlay peer-as {{ $.overlay_as }}
 / configure router bgp group overlay local-as as-number {{ $.overlay_as }}
 {{- range $name, $node := $.clab_nodes }}
-{{- if .cluster_id }}
 / configure router bgp neighbor {{ $node.system_ip }} group overlay
-{{- end -}}
 {{- end -}}
