@@ -66,4 +66,5 @@ gnmic -a clab-mpls-iot-lab-vmx1 -u admin -p admin@123 -e json_ietf --insecure ge
 ```
 
 ## Netbox onboarding plugin
-At https://github.com/networktocode/ntc-netbox-plugin-onboarding there is an onboarding plugin that could be added as another means to operationalize SROS devices quickly
+At https://github.com/networktocode/ntc-netbox-plugin-onboarding there is an onboarding plugin that could be added as another means to operationalize SROS devices quickly, 
+see https://github.com/netbox-community/netbox-docker/wiki/Using-Netbox-Plugins on how to add
