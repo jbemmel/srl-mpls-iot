@@ -22,6 +22,7 @@ topology:
       config:
         vars:
           system_ip: 1.1.1.1
+          sid: 11
           isis: 65001
 
     r2:
@@ -29,6 +30,7 @@ topology:
       config:
         vars:
           system_ip: 2.2.2.2
+          sid: 22
           isis: 65002
 
     r3:
@@ -36,6 +38,7 @@ topology:
       config:
         vars:
           system_ip: 3.3.3.3
+          sid: 33
           isis: 65003
 
 

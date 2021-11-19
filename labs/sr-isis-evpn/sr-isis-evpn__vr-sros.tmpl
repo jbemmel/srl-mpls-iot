@@ -40,10 +40,13 @@
 / configure router isis 0 advertise-router-capability area
 / configure router isis 0 segment-routing prefix-sid-range global
 / configure router isis 0 router-id {{ .system_ip }} segment-routing admin-state enable
-/ configure router isis 0 interface system passive true admin-state enable
+/ configure router isis 0 interface system passive true admin-state enable ipv4-node-sid index {{ .sid }}
 {{ range $name, $link := .clab_links }}
 / configure router isis 0 interface {{ $link.clab_link_name }} level-capability 2 interface-type point-to-point admin-state enable
 {{- end }}
+{{/* or sr-te? */}}
+/ configure router bgp next-hop-resolution shortcut-tunnel family ipv4 resolution filter resolution-filter ldp false sr-isis true
+/ configure router bgp next-hop-resolution labeled-routes transport-tunnel family label-ipv4 resolution filter resolution-filter ldp false sr-isis true
 / configure router isis 0 admin-state enable
 {{- end }}
 
@@ -57,10 +60,12 @@
 {{- end -}}
 
 {{/* Overlay Config */}}
-/ configure router bgp group overlay family evpn true
+/ configure router bgp group overlay family evpn true label-ipv4 true
 / configure router bgp group overlay peer-as {{ $.overlay_as }}
 / configure router bgp group overlay local-address {{ $.system_ip }}
 / configure router bgp group overlay local-as as-number {{ $.overlay_as }}
 {{- range $name, $link := .clab_links }}
 / configure router bgp neighbor {{(index $.clab_nodes $link.clab_far.clab_node).system_ip}} group overlay
-{{- end -}}
+{{- end }}
+
+/ configure system management-interface yang-modules openconfig-modules true
