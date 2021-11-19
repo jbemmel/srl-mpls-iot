@@ -61,6 +61,7 @@
 
 {{/* Overlay Config */}}
 / configure router bgp group overlay family evpn true label-ipv4 true
+/ configure router bgp group overlay export policy system_ip
 / configure router bgp group overlay peer-as {{ $.overlay_as }}
 / configure router bgp group overlay local-address {{ $.system_ip }}
 / configure router bgp group overlay local-as as-number {{ $.overlay_as }}
