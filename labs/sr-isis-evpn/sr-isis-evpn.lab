@@ -13,47 +13,80 @@ topology:
     vr-sros:
       image: vrnetlab/vr-sros:21.10.R1
       type: sr-1s # integrated single VM
-      license: ../../../vrnetlab/sros/SR_OS_VSR-SIM_license.txt
+      license: /Projects/SR_OS_VSR-SIM_license.txt
+
+    srl:
+      type: ixrd2
+      # image: ghcr.io/nokia/srlinux
+      image: srl/auto-config-v2:latest
+      # startup-config: auto-config.json
+      delta-config: delta-auto-config.cmd
+      extras:
+        srl-agents: [ ../../../srl-self-organizing/auto-config-agent.yml ]
+    linux:
+      # image: ghcr.io/hellt/network-multitool
+      image: alpine-with-lldp:latest # Custom built image with lldpad
 
 #-----------------------------------------------------#
   nodes:
-    r1:
+    spine1:
       kind: vr-sros
+      type: sr-1s
       config:
         vars:
           system_ip: 1.1.1.1
           sid: 11
           isis: 65001
 
-    r2:
+    spine2:
       kind: vr-sros
+      type: sr-1s
       config:
         vars:
           system_ip: 2.2.2.2
           sid: 22
           isis: 65002
 
-    r3:
+    spine3:
       kind: vr-sros
+      type: sr-1s
       config:
         vars:
           system_ip: 3.3.3.3
           sid: 33
           isis: 65003
 
+    leaf1: { kind: srl, group: leaves }
+    leaf2: { kind: srl, group: leaves }
+    leaf3: { kind: srl, group: leaves }
 
   links:
-  - endpoints: ["r1:eth1", "r2:eth1"]
+  - endpoints: ["spine1:eth1", "spine2:eth1"]
     vars:
       port: [1/1/c1,1/1/c1]
       clab_link_ip: 10.0.0.0/31
 
-  - endpoints: ["r1:eth2", "r3:eth1"]
+  - endpoints: ["spine1:eth2", "spine3:eth1"]
     vars:
       port: [1/1/c2,1/1/c1]
       clab_link_ip: 10.0.0.2/31
 
-  - endpoints: ["r2:eth2", "r3:eth2"]
+  - endpoints: ["spine2:eth2", "spine3:eth2"]
     vars:
       port: [1/1/c2,1/1/c2]
       clab_link_ip: 10.0.0.4/31
+
+  - endpoints: ["spine1:eth3", "leaf1:e1-49"]
+    vars:
+      port: [1/1/c3,ethernet-1/49]
+      clab_link_ip: 10.0.0.6/31
+
+  - endpoints: ["spine2:eth3", "leaf2:e1-49"]
+    vars:
+      port: [1/1/c3,ethernet-1/49]
+      clab_link_ip: 10.0.0.8/31
+
+  - endpoints: ["spine3:eth3", "leaf3:e1-49"]
+    vars:
+      port: [1/1/c3,ethernet-1/49]
+      clab_link_ip: 10.0.0.10/31
