@@ -43,6 +43,7 @@
 / configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 from prefix-list external_routes
 / configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 action action-type accept
 / configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 action next-hop {{ .anycast_nexthop_ip }}
+{{/* Rewriting the AS path is optional, it helps to see which routes are anycasted */}}
 / configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 action as-path replace "ANYCAST-AS"
 / configure policy-options policy-statement rewrite_nexthop_to_anycast default-action action-type reject
 {{- end }}
