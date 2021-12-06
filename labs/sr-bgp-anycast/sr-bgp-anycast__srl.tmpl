@@ -27,6 +27,7 @@
 / network-instance default protocols bgp autonomous-system {{ .as }}
 / network-instance default protocols bgp ebgp-default-policy import-reject-all false
 / network-instance default protocols bgp ebgp-default-policy export-reject-all false
+/ network-instance default protocols bgp ipv4-unicast multipath max-paths-level-1 64 max-paths-level-2 64
 / network-instance default protocols bgp group underlay timers connect-retry 1
 / network-instance default protocols bgp group underlay timers minimum-advertisement-interval 1
 / network-instance default protocols bgp group underlay ipv4-unicast admin-state enable

@@ -17,8 +17,9 @@
 / configure router interface system ipv4 primary address {{ .system_ip }}
 / configure router interface system ipv4 primary prefix-length 32
 
-{{/* policy to allow system ip */}}
+{{/* policy to allow system ips - including those from neighbors */}}
 / configure policy-options prefix-list system_ip prefix {{ .system_ip }}/32 type exact
+/ configure policy-options prefix-list system_ip prefix 0.0.0.0/0 type range start-length 32 end-length 32
 / configure policy-options policy-statement system_ip entry 10 from prefix-list system_ip
 / configure policy-options policy-statement system_ip entry 10 action action-type accept
 {{- end }}
@@ -32,9 +33,9 @@
 
 {{/* policy to allow anycast ip */}}
 / configure policy-options prefix-list anycast_ip prefix {{ .anycast_nexthop_ip }}/32 type exact
-/ configure policy-options policy-statement system_ip entry 20 from prefix-list anycast_ip
-/ configure policy-options policy-statement system_ip entry 20 action action-type accept
-/ configure policy-options policy-statement system_ip entry 20 action as-path replace "ANYCAST-AS"
+/ configure policy-options policy-statement system_ip entry 5 from prefix-list anycast_ip
+/ configure policy-options policy-statement system_ip entry 5 action action-type accept
+/ configure policy-options policy-statement system_ip entry 5 action as-path replace "ANYCAST-AS"
 
 {{/* policy to rewrite nexthop/AS-path of external routes to anycast, to be applied towards RR in overlay (only) */}}
 / configure policy-options prefix-list external_routes prefix 10.42.42.0/24 type exact
