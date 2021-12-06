@@ -6,6 +6,18 @@ Having read [this](https://blog.ipspace.net/2021/11/anycast-mpls.html) made me w
 
 ![plot](BGP_Anycast_lab.PNG)
 
+# Installation
+Prerequisites: Docker and Containerlab installed
+```
+git checkout https://github.com/jbemmel/srl-mpls-iot.git
+cd srl-mpls-iot/labs/sr-bgp-anycast
+sudo containerlab deploy -t ./sr-bgp-anycast.lab
+```
+Wait until the nodes have booted, then:
+```
+sudo containerlab config -t ./sr-bgp-anycast.lab -l sr-bgp-anycast -p .
+```
+
 ## BGP Anycast
 Conceptually, an anycast address represents a set of equivalent destinations. It is commonly used in load-balancers and DNS services to direct clients to the 'closest' resource that can satisfy their request. In Ivan's case, if the problem is that the Route Reflector can only advertise one (1) best path per prefix, a potential solution is to use an anycast IP as that single next hop associated with that prefix. That way, nodes in the network can figure out what their locally preferred set of next hops might be.
 
