@@ -8,6 +8,8 @@ Having read [this](https://blog.ipspace.net/2021/11/anycast-mpls.html) made me w
 
 # Installation
 Prerequisites: Docker and Containerlab installed
+
+SROS image - see [build instructions](https://containerlab.srlinux.dev/manual/vrnetlab/)
 ```
 git checkout https://github.com/jbemmel/srl-mpls-iot.git
 cd srl-mpls-iot/labs/sr-bgp-anycast
@@ -23,4 +25,101 @@ Conceptually, an anycast address represents a set of equivalent destinations. It
 
 None of this is particularly new; this [SROS 9.0R1 Advanced Solution Guide from 2011](https://documentation.nokia.com/html/0_add-h-f/93-0267-HTML/7X50_Advanced_Configuration_Guide/BGP_anycast.pdf) described it in great detail for example. That feature applies to MPLS networks with BGP labels and what have you; it creates an active/standby pair of anycast addresses for additional redundancy (which would lead us back to the maximum 1 best path issue...).
 
+## Sample routing table
+On SRL node m:
+```
+A:m# show route-table ipv4-unicast summary
+---------------------------------------------------------------------------------------------------------------------------------
+IPv4 unicast route table of network instance default
+---------------------------------------------------------------------------------------------------------------------------------
++-----------------+-------+------------+-------------------+----------+---------+-----------------------+-----------------------+
+|   Prefix        |  ID   | Route Type |     Route Owner   |  Metric  |  Pref   |    Next-hop (Type)    |  Next-hop Interface   |
+|                 |       |            |                   |          |         |                       |                       |
++=================+=======+============+===================+==========+=========+=======================+=======================+
+| 10.0.0.1/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.14           | None                  |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.2/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.12           | None                  |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.3/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.14           | None                  |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.4/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.12           | None                  |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.5/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.14           | None                  |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.6/32     | 4     | host       | net_inst_mgr      | 0        | 0       | None (extract)        | None                  |
+| 10.0.0.7/32     | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.12           | None                  |
+|                 |       |            |                   |          |         | (indirect)            | None                  |
+|                 |       |            |                   |          |         | 172.16.0.14           |                       |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.0.0.45/32    | 0     | bgp        | bgp_mgr           | 0        | 170     | 172.16.0.12           | None                  |
+|                 |       |            |                   |          |         | (indirect)            | None                  |
+|                 |       |            |                   |          |         | 172.16.0.14           |                       |
+|                 |       |            |                   |          |         | (indirect)            |                       |
+| 10.42.42.0/24   | 0     | bgp        | bgp_mgr           | 0        | 170     | 10.0.0.45 (indirect)  | None                  |
+| 172.16.0.12/31  | 2     | local      | net_inst_mgr      | 0        | 0       | 172.16.0.13 (direct)  | ethernet-1/1.0        |
+| 172.16.0.13/32  | 2     | host       | net_inst_mgr      | 0        | 0       | None (extract)        | None                  |
+| 172.16.0.14/31  | 3     | local      | net_inst_mgr      | 0        | 0       | 172.16.0.15 (direct)  | ethernet-1/2.0        |
+| 172.16.0.15/32  | 3     | host       | net_inst_mgr      | 0        | 0       | None (extract)        | None                  |
++-----------------+-------+------------+-------------------+----------+---------+-----------------------+-----------------------+
+IPv4 routes total                    : 13
+IPv4 prefixes with active routes     : 13
+IPv4 prefixes with active ECMP routes: 2
 
+--{ + running }--[ network-instance default ]--         
+A:m# ping 10.42.42.0 -I 10.0.0.6 -c3                    
+Using network instance default
+PING 10.42.42.0 (10.42.42.0) from 10.0.0.6 : 56(84) bytes of data.
+64 bytes from 10.42.42.0: icmp_seq=1 ttl=63 time=17.1 ms
+64 bytes from 10.42.42.0: icmp_seq=2 ttl=63 time=9.87 ms
+64 bytes from 10.42.42.0: icmp_seq=3 ttl=63 time=11.6 ms
+
+--- 10.42.42.0 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 9.870/12.863/17.084/3.071 ms
+--{ + running }--[ network-instance default ]--
+```
+### BGP routes and AS paths
+```
+A:m# /show network-instance default protocols bgp routes ipv4 summary                            
+-------------------------------------------------------------------------------------------------
+Show report for the BGP route table of network-instance "default"
+-------------------------------------------------------------------------------------------------
+Status codes: u=used, *=valid, >=best, x=stale
+Origin codes: i=IGP, e=EGP, ?=incomplete
+-------------------------------------------------------------------------------------------------
++--------+-----------------------+---------------+--------+--------+----------------------------+
+| Status |        Network        |  Next Hop     |  MED   | LocPre |         Path Val           |
+|        |                       |               |        |   f    |                            |
++========+=======================+===============+========+========+============================+
+| *      | 10.0.0.1/32           | 172.16.0.12   | -      | 100    | [65004, 65005, 65001] i    |
+| u*>    | 10.0.0.1/32           | 172.16.0.14   | -      | 100    | [65005, 65001] i           |
+| u*>    | 10.0.0.2/32           | 172.16.0.12   | -      | 100    | [65004, 65002] i           |
+| *      | 10.0.0.2/32           | 172.16.0.14   | -      | 100    | [65005, 65003, 65002] i    |
+| *      | 10.0.0.3/32           | 172.16.0.12   | -      | 100    | [65004, 65002, 65003] i    |
+| u*>    | 10.0.0.3/32           | 172.16.0.14   | -      | 100    | [65005, 65003] i           |
+| u*>    | 10.0.0.4/32           | 172.16.0.12   | -      | 100    | [65004] i                  |
+| *      | 10.0.0.4/32           | 172.16.0.14   | -      | 100    | [65005, 65004] i           |
+| *      | 10.0.0.5/32           | 172.16.0.12   | -      | 100    | [65004, 65005] i           |
+| u*>    | 10.0.0.5/32           | 172.16.0.14   | -      | 100    | [65005] i                  |
+| u*>    | 10.0.0.6/32           | 0.0.0.0       | -      | 100    |  i                         |
+|        | 10.0.0.6/32           | 172.16.0.12   | -      | 100    | [65004, 65006] i           |
+|        | 10.0.0.6/32           | 172.16.0.14   | -      | 100    | [65005, 65006] i           |
+| u*>    | 10.0.0.7/32           | 172.16.0.12   | -      | 100    | [65004, 65100] i           |
+| u*>    | 10.0.0.7/32           | 172.16.0.14   | -      | 100    | [65005, 65100] i           |
+| u*>    | 10.0.0.45/32          | 172.16.0.12   | -      | 100    | [65004, 64999] i           |
+| u*>    | 10.0.0.45/32          | 172.16.0.14   | -      | 100    | [65005, 64999] i           |
+| u*>    | 10.42.42.0/24         | 10.0.0.45     | -      | 100    | [65001, 65004, 64999] ?    |
+|        | 10.42.42.0/24         | 172.16.0.12   | -      | 100    | [65004, 65100] ?           |
+|        | 10.42.42.0/24         | 172.16.0.14   | -      | 100    | [65005, 65100] ?           |
+|        | 10.42.42.0/32         | 172.16.0.12   | -      | 100    | [65004, 65100] i           |
+|        | 10.42.42.0/32         | 172.16.0.14   | -      | 100    | [65005, 65100] i           |
+| u*>    | 172.16.0.12/31        | 0.0.0.0       | -      | 100    |  i                         |
+| u*>    | 172.16.0.14/31        | 0.0.0.0       | -      | 100    |  i                         |
+|        | 172.16.0.16/31        | 172.16.0.14   | -      | 100    | [65005, 65100] i           |
+|        | 172.16.0.18/31        | 172.16.0.12   | -      | 100    | [65004, 65100] i           |
++--------+-----------------------+---------------+--------+--------+----------------------------+
+26 received BGP routes: 13 used, 18 valid, 0 stale
+13 available destinations: 13 with ECMP multipaths
+--------------------------------------------------
+--{ + running }--[ network-instance default ]--
+```
