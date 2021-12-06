@@ -20,7 +20,7 @@
 {{/* policy to allow system ip */}}
 / configure policy-options prefix-list system_ip prefix {{ .system_ip }}/32 type exact
 / configure policy-options policy-statement system_ip entry 10 from prefix-list system_ip
-/ configure policy-options policy-statement system_ip entry 10 action action-type next-policy
+/ configure policy-options policy-statement system_ip entry 10 action action-type accept
 {{- end }}
 
 {{/* Configure anycast loopback interface */}}
