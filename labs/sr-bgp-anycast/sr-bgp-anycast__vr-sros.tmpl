@@ -43,8 +43,8 @@
 {{- if .as }}
 {{/* Underlay Config */}}
 / configure router autonomous-system {{ .as }}
-/ configure router bgp ebgp-default-reject-policy import false
-/ configure router bgp ebgp-default-reject-policy export false
+/ configure router bgp ebgp-default-reject-policy import true
+/ configure router bgp ebgp-default-reject-policy export true
 / configure router bgp min-route-advertisement 1
 {{/* / configure router bgp group underlay family ipv4 true */}}
 / configure router bgp group underlay export policy system_ip
