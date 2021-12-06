@@ -80,7 +80,7 @@ rtt min/avg/max/mdev = 9.870/12.863/17.084/3.071 ms
 ```
 ### BGP routes and AS paths
 ```
-A:m# /show network-instance default protocols bgp routes ipv4 summary                                                                                                                                              
+A:m# /show network-instance default protocols bgp routes ipv4 summary                            
 -------------------------------------------------------------------------------------------------
 Show report for the BGP route table of network-instance "default"
 -------------------------------------------------------------------------------------------------
@@ -121,4 +121,5 @@ Origin codes: i=IGP, e=EGP, ?=incomplete
 26 received BGP routes: 13 used, 18 valid, 0 stale
 13 available destinations: 13 with ECMP multipaths
 --------------------------------------------------
+--{ + running }--[ network-instance default ]--
 ```
