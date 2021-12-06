@@ -61,6 +61,7 @@ topology:
         vars:
           system_ip: 10.0.0.4
           as: 65004
+          anycast_nexthop_ip: 10.0.0.45
 
     d:
       kind: vr-sros
@@ -68,6 +69,7 @@ topology:
         vars:
           system_ip: 10.0.0.5
           as: 65005
+          anycast_nexthop_ip: 10.0.0.45
 
     m: # Goal: should get ECMP routes via both C and D
       kind: srl

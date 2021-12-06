@@ -23,6 +23,23 @@
 / configure policy-options policy-statement system_ip entry 10 action action-type accept
 {{- end }}
 
+{{/* Configure anycast loopback interface */}}
+{{- if .anycast_nexthop_ip }}
+/ configure router interface lo0 loopback ipv4 primary address {{ .anycast_nexthop_ip }}
+/ configure router interface lo0 ipv4 primary prefix-length 32
+
+{{/* policy to allow anycast ip */}}
+/ configure policy-options prefix-list anycast_ip prefix {{ .anycast_nexthop_ip }}/32 type exact
+/ configure policy-options policy-statement system_ip entry 20 from prefix-list anycast_ip
+/ configure policy-options policy-statement system_ip entry 20 action action-type accept
+
+{{/* policy to rewrite nexthop to anycast ip, to be applied towards RR *in overlay* */}}
+/ configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 from prefix-list anycast_ip
+/ configure policy-options policy-statement rewrite_nexthop_to_anycast entry 10 action action-type accept
+/ configure policy-options policy-statement rewrite_nexthop_to_anycast default-action action-type accept
+/ configure policy-options policy-statement rewrite_nexthop_to_anycast default-action next-hop {{ .anycast_nexthop_ip }}
+{{- end }}
+
 {{- if .as }}
 {{/* Underlay Config */}}
 / configure router autonomous-system {{ .as }}
@@ -45,6 +62,9 @@
 / configure router bgp group RR family ipv4 true
 / configure router bgp group RR peer-as {{ $.overlay_as }}
 / configure router bgp group RR local-as as-number {{ $.overlay_as }}
+{{- if .anycast_nexthop_ip }}
+/ configure router bgp group RR export policy rewrite_nexthop_to_anycast
+{{- end }}
 {{- range $name, $node := $.clab_nodes }}
 {{- if .cluster_id }}
 / configure router bgp neighbor {{ $node.system_ip }} group RR
