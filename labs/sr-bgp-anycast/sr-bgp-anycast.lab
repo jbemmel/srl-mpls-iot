@@ -113,3 +113,23 @@ topology:
     vars:
       port: [1/1/c3,ethernet-1/2]
       clab_link_ip: 172.16.0.10/31
+
+# M links
+  - endpoints: ["c:eth4", "m:e1-1"]
+    vars:
+      port: [1/1/c4,ethernet-1/1]
+      clab_link_ip: 172.16.0.12/31
+  - endpoints: ["d:eth4", "m:e1-2"]
+    vars:
+      port: [1/1/c4,ethernet-1/2]
+      clab_link_ip: 172.16.0.14/31
+
+# Y links (eBGP to external world)
+  - endpoints: ["c:eth5", "y:e1-1"]
+    vars:
+      port: [1/1/c5,ethernet-1/1]
+      clab_link_ip: 172.16.0.16/31
+  - endpoints: ["d:eth5", "y:e1-2"]
+    vars:
+      port: [1/1/c5,ethernet-1/2]
+      clab_link_ip: 172.16.0.18/31
