@@ -28,10 +28,10 @@ None of this is particularly new; this [SROS 9.0R1 Advanced Solution Guide from 
 ## Sample routing table
 On SRL node m:
 ```
-A:m# show route-table ipv4-unicast summary                                                                                                                                                                         
-------------------------------------------------------------------------------------------------------------------------------------
+A:m# show route-table ipv4-unicast summary
+---------------------------------------------------------------------------------------------------------------------------------
 IPv4 unicast route table of network instance default
-------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
 +-----------------+-------+------------+-------------------+----------+---------+-----------------------+-----------------------+
 |   Prefix        |  ID   | Route Type |     Route Owner   |  Metric  |  Pref   |    Next-hop (Type)    |  Next-hop Interface   |
 |                 |       |            |                   |          |         |                       |                       |
@@ -65,8 +65,8 @@ IPv4 routes total                    : 13
 IPv4 prefixes with active routes     : 13
 IPv4 prefixes with active ECMP routes: 2
 
---{ + running }--[ network-instance default ]--                                                                                                                                                                    
-A:m# ping 10.42.42.0 -I 10.0.0.6 -c3                                                                                                                                                                               
+--{ + running }--[ network-instance default ]--         
+A:m# ping 10.42.42.0 -I 10.0.0.6 -c3                    
 Using network instance default
 PING 10.42.42.0 (10.42.42.0) from 10.0.0.6 : 56(84) bytes of data.
 64 bytes from 10.42.42.0: icmp_seq=1 ttl=63 time=17.1 ms
