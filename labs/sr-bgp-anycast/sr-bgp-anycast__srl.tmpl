@@ -14,15 +14,11 @@
 / network-instance default interface system0.0
 
 {{/* policy to allow system ip */}}
-/ routing-policy
-/ routing-policy prefix-set system_ip
 / routing-policy prefix-set system_ip prefix {{ .system_ip }}/32 mask-length-range exact
-/ routing-policy policy system_ip
-/ routing-policy policy system_ip statement 10
 / routing-policy policy system_ip statement 10 match prefix-set system_ip
 / routing-policy policy system_ip statement 10 action accept
 
-/ routing-policy policy accept-all default-action accept
+/ routing-policy policy reject-all default-action reject
 
 {{/* Underlay Config */}}
 / network-instance default protocols bgp router-id {{ .system_ip }}
@@ -57,9 +53,9 @@
 / network-instance default protocols bgp group RR transport local-address {{ .system_ip }}
 / network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
 / network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
-/ network-instance default protocols bgp group RR export-policy accept-all
 
 {{- if not .cluster_id }}
+/ network-instance default protocols bgp group RR export-policy reject-all
   {{- range $name, $node := $.clab_nodes }}
     {{- if .cluster_id }}
 / network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
