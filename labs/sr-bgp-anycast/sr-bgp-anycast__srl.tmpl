@@ -22,10 +22,12 @@
 / routing-policy policy system_ip statement 10 match prefix-set system_ip
 / routing-policy policy system_ip statement 10 action accept
 
+/ routing-policy policy accept-all default-action accept
+
 {{/* Underlay Config */}}
 / network-instance default protocols bgp router-id {{ .system_ip }}
 / network-instance default protocols bgp autonomous-system {{ .as }}
-/ network-instance default protocols bgp ebgp-default-policy import-reject-all true
+/ network-instance default protocols bgp ebgp-default-policy import-reject-all false
 / network-instance default protocols bgp ebgp-default-policy export-reject-all true
 / network-instance default protocols bgp group underlay timers connect-retry 1
 / network-instance default protocols bgp group underlay timers minimum-advertisement-interval 1
@@ -55,6 +57,7 @@
 / network-instance default protocols bgp group RR transport local-address {{ .system_ip }}
 / network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
 / network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
+/ network-instance default protocols bgp group RR export-policy accept-all
 
 {{- if not .cluster_id }}
   {{- range $name, $node := $.clab_nodes }}
