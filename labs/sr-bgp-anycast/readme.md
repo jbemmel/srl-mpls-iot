@@ -4,7 +4,7 @@ Ivan was [at it again](https://blog.ipspace.net/2021/12/bgp-multipath-addpath.ht
 
 Having read [this](https://blog.ipspace.net/2021/11/anycast-mpls.html) made me wonder if there wasn't another simpler, multi-vendor solution to be explored, one that doesn't require exotic BGP features or prolonged maintenance windows. One that doesn't depend on scarce engineering resources, or hard to get vendor images.
 
-![plot](BGP_Anycast.png)
+![plot](BGP_Anycast_lab.PNG)
 
 ## BGP Anycast
 Conceptually, an anycast address represents a set of equivalent destinations. It is commonly used in load-balancers and DNS services to direct clients to the 'closest' resource that can satisfy their request. In Ivan's case, if the problem is that the Route Reflector can only advertise one (1) best path per prefix, a potential solution is to use an anycast IP as that single next hop associated with that prefix. That way, nodes in the network can figure out what their locally preferred set of next hops might be.
