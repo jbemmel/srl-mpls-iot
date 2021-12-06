@@ -8,6 +8,7 @@ Having read [this](https://blog.ipspace.net/2021/11/anycast-mpls.html) made me w
 
 # Installation
 Prerequisites: Docker and Containerlab installed
+
 SROS image - see [build instructions](https://containerlab.srlinux.dev/manual/vrnetlab/)
 ```
 git checkout https://github.com/jbemmel/srl-mpls-iot.git
