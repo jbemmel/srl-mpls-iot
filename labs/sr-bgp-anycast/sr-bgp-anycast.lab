@@ -16,16 +16,19 @@ topology:
     config:
       vars:
         overlay_as: 65000
+        anycast_as: 64999 # Must be different
 
 #----------------------------------------------------#
   kinds:
     vr-sros:
+      group: SROS
       image: vrnetlab/vr-sros:21.10.R1
       type: sr-1s # integrated single VM
       license: /Projects/SR_OS_VSR-SIM_license.txt
 
     srl:
       type: ixrd2
+      group: SRL
       # image: ghcr.io/nokia/srlinux
       image: srl/auto-config-v2:latest
       extras:
@@ -35,6 +38,7 @@ topology:
   nodes:
     rr:
       kind: srl
+      group: RR
       config:
         vars:
           system_ip: 10.0.0.1
@@ -80,6 +84,7 @@ topology:
 
     y:
       kind: srl
+      group: external
       config:
         vars:
           system_ip: 10.0.0.7

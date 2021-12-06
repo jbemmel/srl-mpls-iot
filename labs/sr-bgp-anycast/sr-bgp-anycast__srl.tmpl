@@ -13,10 +13,12 @@
 / network-instance default type default
 / network-instance default interface system0.0
 
-{{/* policy to allow system ip */}}
-/ routing-policy prefix-set system_ip prefix {{ .system_ip }}/32 mask-length-range exact
-/ routing-policy policy system_ip statement 10 match prefix-set system_ip
-/ routing-policy policy system_ip statement 10 action accept
+{{/* policy to allow system ip and neihbor loopbacks */}}
+/ routing-policy prefix-set system_ips prefix {{ .system_ip }}/32 mask-length-range exact
+/ routing-policy prefix-set system_ips prefix 10.0.0.0/24 mask-length-range 32..32
+/ routing-policy policy system_ips statement 10 match prefix-set system_ips
+/ routing-policy policy system_ips statement 10 action accept
+/ routing-policy policy system_ips default-action reject
 
 / routing-policy policy reject-all default-action reject
 
@@ -28,7 +30,7 @@
 / network-instance default protocols bgp group underlay timers connect-retry 1
 / network-instance default protocols bgp group underlay timers minimum-advertisement-interval 1
 / network-instance default protocols bgp group underlay ipv4-unicast admin-state enable
-/ network-instance default protocols bgp group underlay export-policy system_ip
+/ network-instance default protocols bgp group underlay import-policy system_ips export-policy system_ips
 
 {{/* Configure underlay ebgp on links */}}
 {{- range $name, $link := .clab_links -}}
@@ -42,6 +44,8 @@
 / network-instance default static-routes route {{ $.static_route_prefix }} next-hop-group blackhole
 / network-instance default next-hop-groups group blackhole admin-state enable blackhole
 / routing-policy prefix-set system_ip prefix {{ $.static_route_prefix }} mask-length-range exact
+/ routing-policy policy accept-all default-action accept
+/ network-instance default protocols bgp group underlay export-policy accept-all
 {{- end -}}
 
 {{/* RR Config, unless disabled */}}
