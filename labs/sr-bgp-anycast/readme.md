@@ -1,4 +1,4 @@
-# Automating BGP anycast 🔨 (one next-hop 💍 to rule them all)
+# Automating BGP anycast 🔨 (one next-hop to rule them all 💍)
 
 Ivan was [at it again](https://blog.ipspace.net/2021/12/bgp-multipath-addpath.html) last week, taking his [Netsim tools](https://github.com/ipspace/netsim-tools) to task on a set of virtual nodes to solve a particular issue with sub-optimal routing using the 'addpath' capability.
 
