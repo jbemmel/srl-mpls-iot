@@ -60,9 +60,18 @@
 
 {{- if not .cluster_id }}
 / network-instance default protocols bgp group RR export-policy reject-all
+{{- else -}}
+/ routing-policy policy external-routes default-action reject
+/ routing-policy policy external-routes statement 10 match prefix-set external-routes
+/ routing-policy policy external-routes statement 10 action action-type accept
+/ network-instance default protocols bgp group RR export-policy external-routes
+{{- end -}}
   {{- range $name, $node := $.clab_nodes }}
     {{- if .cluster_id }}
 / network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
+    {{- end -}}
+    {{- if .static_route_prefix }}
+/ routing-policy prefix-set external-routes prefix {{ .static_route_prefix }} mask-length-range exact
     {{- end -}}
   {{- end -}}
 {{- end -}}
