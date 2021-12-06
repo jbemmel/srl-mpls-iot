@@ -1,0 +1,95 @@
+#
+# Container lab to test 7750 SR BGP Anycast
+#
+# See https://documentation.nokia.com/html/0_add-h-f/93-0267-HTML/7X50_Advanced_Configuration_Guide/BGP_anycast.pdf (from 2011 SROS 9.0R1)
+#
+# Triggered by:
+# - https://blog.ipspace.net/2021/11/anycast-mpls.html
+# - BGP Add Path: https://blog.ipspace.net/2021/12/bgp-multipath-addpath.html
+#
+# Configure: sudo containerlab config -t ./sr-bgp-anycast.lab -l sr-bgp-anycast -p .
+#
+name: sr-bgp-anycast
+
+topology:
+  defaults:
+    config:
+      vars:
+        as: 65000
+        external_as: 65100
+#----------------------------------------------------#
+  kinds:
+    vr-sros:
+      image: vrnetlab/vr-sros:21.10.R1
+      type: sr-1s # integrated single VM
+      license: /Projects/SR_OS_VSR-SIM_license.txt
+
+    srl:
+      type: ixrd2
+      # image: ghcr.io/nokia/srlinux
+      image: srl/auto-config-v2:latest
+      extras:
+        srl-agents: [ ../../../srl-self-organizing/auto-config-agent.yml ]
+
+#-----------------------------------------------------#
+  nodes:
+    rr:
+      kind: srl
+      config:
+        vars:
+          system_ip: 10.0.0.1
+
+    a: # Goal: should get C->Y route
+      kind: srl
+      config:
+        vars:
+          system_ip: 10.0.0.2
+
+    b:
+      kind: srl
+      config:
+        vars:
+          system_ip: 10.0.0.3
+
+    c:
+      kind: vr-sros
+      config:
+        vars:
+          system_ip: 10.0.0.4
+
+    d:
+      kind: vr-sros
+      config:
+        vars:
+          system_ip: 10.0.0.5
+
+    m: # Goal: should get ECMP routes via both C and D
+      kind: srl
+      config:
+        vars:
+          system_ip: 10.0.0.6
+
+    y:
+      kind: srl
+      config:
+        vars:
+          system_ip: 10.0.0.7
+
+  links:
+  - endpoints: ["a:e1-1", "b:e1-1"]
+    vars:
+      port: [ethernet-1/1,ethernet-1/1]
+      clab_link_ip: 172.16.0.0/31
+  - endpoints: ["a:e1-2", "c:eth1"]
+    vars:
+      port: [ethernet-1/2,1/1/c1]
+      clab_link_ip: 172.16.0.2/31
+  - endpoints: ["b:e1-2", "d:eth1"]
+    vars:
+      port: [ethernet-1/2,1/1/c1]
+      clab_link_ip: 172.16.0.4/31
+
+  - endpoints: ["c:eth2", "d:eth2"]
+    vars:
+      port: [1/1/c2,1/1/c2]
+      clab_link_ip: 172.16.0.6/31
