@@ -15,8 +15,8 @@ topology:
   defaults:
     config:
       vars:
-        as: 65000
-        external_as: 65100
+        overlay_as: 65000
+
 #----------------------------------------------------#
   kinds:
     vr-sros:
@@ -38,42 +38,51 @@ topology:
       config:
         vars:
           system_ip: 10.0.0.1
+          cluster_id: 10.10.10.10
+          as: 65001
 
     a: # Goal: should get C->Y route
       kind: srl
       config:
         vars:
           system_ip: 10.0.0.2
+          as: 65002
 
     b:
       kind: srl
       config:
         vars:
           system_ip: 10.0.0.3
+          as: 65003
 
     c:
       kind: vr-sros
       config:
         vars:
           system_ip: 10.0.0.4
+          as: 65004
 
     d:
       kind: vr-sros
       config:
         vars:
           system_ip: 10.0.0.5
+          as: 65005
 
     m: # Goal: should get ECMP routes via both C and D
       kind: srl
       config:
         vars:
           system_ip: 10.0.0.6
+          as: 65006
 
     y:
       kind: srl
       config:
         vars:
           system_ip: 10.0.0.7
+          overlay_as: 0   # eBGP with edge nodes only
+          as: 65100
 
   links:
   - endpoints: ["a:e1-1", "b:e1-1"]
@@ -88,8 +97,17 @@ topology:
     vars:
       port: [ethernet-1/2,1/1/c1]
       clab_link_ip: 172.16.0.4/31
-
   - endpoints: ["c:eth2", "d:eth2"]
     vars:
       port: [1/1/c2,1/1/c2]
       clab_link_ip: 172.16.0.6/31
+
+# RR links
+  - endpoints: ["b:e1-3", "rr:e1-1"]
+    vars:
+      port: [ethernet-1/3,ethernet-1/1]
+      clab_link_ip: 172.16.0.8/31
+  - endpoints: ["d:eth3", "rr:e1-2"]
+    vars:
+      port: [1/1/c3,ethernet-1/2]
+      clab_link_ip: 172.16.0.10/31

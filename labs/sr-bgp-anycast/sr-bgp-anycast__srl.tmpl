@@ -32,10 +32,34 @@
 / network-instance default protocols bgp group underlay ipv4-unicast admin-state enable
 / network-instance default protocols bgp group underlay export-policy system_ip
 
-{{/* If the bgp_underlay flag specified under the link then configure underlay ebgp on links */}}
+{{/* Configure underlay ebgp on links */}}
 {{- range $name, $link := .clab_links -}}
-  {{/* - if .bgp_underlay */}}
-/ network-instance default protocols bgp neighbor {{ ip $link.clab_far.clab_link_ip }}  peer-group underlay
+  {{- if true }}
+/ network-instance default protocols bgp neighbor {{ ip $link.clab_far.clab_link_ip }} peer-group underlay
 / network-instance default protocols bgp neighbor {{ ip $link.clab_far.clab_link_ip }} peer-as {{(index $.clab_nodes $link.clab_far.clab_node).as}}
-  {{/* - end */}}
+  {{- end -}}
+{{- end -}}
+
+{{/* RR Config, unless disabled */}}
+{{- if $.overlay_as }}
+/ network-instance default protocols bgp group RR timers connect-retry 1
+/ network-instance default protocols bgp group RR timers minimum-advertisement-interval 1
+{{/* / network-instance default protocols bgp group RR evpn admin-state enable */}}
+/ network-instance default protocols bgp group RR ipv4-unicast admin-state enable
+/ network-instance default protocols bgp group RR transport local-address {{ .system_ip }}
+/ network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
+/ network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
+
+{{- if not .cluster_id }}
+  {{- range $name, $node := $.clab_nodes }}
+    {{- if .cluster_id }}
+/ network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if .cluster_id }}
+/ network-instance default protocols bgp group RR route-reflector client true
+/ network-instance default protocols bgp group RR route-reflector cluster-id {{ .cluster_id }}
+/ network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR
+{{- end -}}
 {{- end -}}
