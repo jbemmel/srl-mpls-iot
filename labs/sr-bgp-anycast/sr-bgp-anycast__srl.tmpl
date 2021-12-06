@@ -40,6 +40,12 @@
   {{- end -}}
 {{- end -}}
 
+{{- if $.static_route_prefix }}
+/ network-instance default static-routes route {{ $.static_route_prefix }} next-hop-group blackhole
+/ network-instance default next-hop-groups group blackhole admin-state enable blackhole
+/ routing-policy prefix-set system_ip prefix {{ $.static_route_prefix }} mask-length-range exact
+{{- end -}}
+
 {{/* RR Config, unless disabled */}}
 {{- if $.overlay_as }}
 / network-instance default protocols bgp group RR timers connect-retry 1
