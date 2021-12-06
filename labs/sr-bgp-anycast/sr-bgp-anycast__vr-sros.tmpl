@@ -22,6 +22,7 @@
 / configure policy-options prefix-list system_ip prefix 0.0.0.0/0 type range start-length 32 end-length 32
 / configure policy-options policy-statement system_ip entry 10 from prefix-list system_ip
 / configure policy-options policy-statement system_ip entry 10 action action-type accept
+/ configure policy-options policy-statement system_ip default-action action-type reject
 {{- end }}
 
 {{/* Configure anycast loopback interface and rewrite policies */}}
