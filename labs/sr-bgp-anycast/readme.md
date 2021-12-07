@@ -114,3 +114,4 @@ Origin codes: i=IGP, e=EGP, ?=incomplete
 20 received BGP routes: 13 used, 18 valid, 0 stale
 13 available destinations: 7 with ECMP multipaths
 ```
+Note the 'invalid' routes to 10.0.0.6/32 here, which include the node's own AS in their AS path. These could be filtered out at the source (this looks like an obvious optimization, however I am not aware of any easy knob to apply this other than spelling out the peer AS to filter out for each peer)
