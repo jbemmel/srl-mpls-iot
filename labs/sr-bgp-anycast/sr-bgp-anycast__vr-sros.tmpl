@@ -63,8 +63,15 @@
 {{/* Configure underlay ebgp on links */}}
 {{- range $name, $link := .clab_links }}
   {{- if true }}
+  {{- $peer := $link.clab_far.clab_node }}
+  {{- $peer_as := (index $.clab_nodes $peer).as }}
 / configure router bgp neighbor {{ ip $link.clab_far.clab_link_ip }} group underlay description "{{ $link.clab_far.clab_node }}"
-/ configure router bgp neighbor {{ ip $link.clab_far.clab_link_ip }} peer-as {{(index $.clab_nodes $link.clab_far.clab_node).as}}
+/ configure router bgp neighbor {{ ip $link.clab_far.clab_link_ip }} peer-as {{ $peer_as }}
+/ configure policy-options as-path "{{ $peer_as }}" expression ".* {{ $peer_as }} .*"
+/ configure policy-options policy-statement "remove_{{ $peer_as }}" entry 10 from as-path name "{{ $peer_as }}"
+/ configure policy-options policy-statement "remove_{{ $peer_as }}" entry 10 action action-type reject
+/ configure policy-options policy-statement "remove_{{ $peer_as }}" default-action action-type next-policy
+/ configure router bgp neighbor {{ ip $link.clab_far.clab_link_ip }} export policy "remove_{{ $peer_as }}"
   {{- end -}}
 {{- end -}}
 
