@@ -47,9 +47,9 @@
 
 / network-instance default static-routes route {{ $.static_route_prefix }} next-hop-group blackhole
 / network-instance default next-hop-groups group blackhole admin-state enable blackhole
-/ routing-policy prefix-set system_ip prefix {{ $.static_route_prefix }} mask-length-range exact
-/ routing-policy policy accept-all default-action accept
-/ network-instance default protocols bgp group underlay export-policy accept-all
+/ routing-policy prefix-set system_ips prefix {{ $.static_route_prefix }} mask-length-range exact
+# / routing-policy policy accept-all default-action accept
+# / network-instance default protocols bgp group underlay export-policy accept-all
 {{- end -}}
 
 {{/* RR Config, unless disabled */}}
