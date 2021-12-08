@@ -160,8 +160,8 @@ Origin codes: i=IGP, e=EGP, ?=incomplete
 |    u*>      10.0.0.5/32          172.16.0.10        -         100        [65005]                     i          |
 |    u*>      10.0.0.6/32          172.16.0.10        -         100        [65005, 65006]              i          |
 |    u*>      10.0.0.7/32          172.16.0.10        -         100        [65005, 65100]              i          |
-|    u*>      10.0.0.45/32         172.16.0.10        -         100        [65005, 64999]              i          |  <= used because of shorter AS path
+|    u*>      10.0.0.45/32         172.16.0.10        -         100        [65005, 64999]              i          |  <= used, shorter AS path
 +-----------------------------------------------------------------------------------------------------------------+
 7 received BGP routes : 5 used 7 valid
 ```
-Note the difference in AS path length towards the nexthop 10.0.0.45/32; the RR only installs a single next hop
+Note the difference in AS path length towards the nexthop 10.0.0.45/32; the RR only installs a single next hop (d)
