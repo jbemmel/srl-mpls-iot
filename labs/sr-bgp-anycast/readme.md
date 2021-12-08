@@ -114,4 +114,54 @@ Origin codes: i=IGP, e=EGP, ?=incomplete
 20 received BGP routes: 13 used, 18 valid, 0 stale
 13 available destinations: 7 with ECMP multipaths
 ```
-Note the 'invalid' routes to 10.0.0.6/32 here, which include the node's own AS in their AS path. These could be filtered out at the source (this looks like an obvious optimization, however I am not aware of any easy knob to apply this other than spelling out the peer AS to filter out for each peer)
+Note the 'invalid' routes to 10.0.0.6/32 here, which include the node's own AS in their AS path. These could be filtered out at the source (this looks like an obvious optimization, however I am not aware of any easy knob to apply this other than spelling out the peer AS to filter out for each peer). Now implemented in the SROS policies
+
+### Route Reflector view
+At the Route Reflector (rr) node, the routes look like this:
+```
+A:rr# /show network-instance default protocols bgp neighbor 172.16.0.8 received-routes ipv4
+----------------------------------------------------------------------------------------------------------
+Peer        : 172.16.0.8, remote AS: 65003, local AS: 65001
+Type        : static
+Description : None
+Group       : underlay
+----------------------------------------------------------------------------------------------------------
+Status codes: u=used, *=valid, >=best, x=stale                  
+Origin codes: i=IGP, e=EGP, ?=incomplete                        
++--------------------------------------------------------------------------------------------------------+
+|  Status      Network             Next Hop       MED   LocPref        AsPath              Origin        |
++========================================================================================================+
+|    u*>      10.0.0.2/32          172.16.0.8      -      100     [65003, 65002]              i          |
+|    u*>      10.0.0.3/32          172.16.0.8      -      100     [65003]                     i          |
+|     *       10.0.0.4/32          172.16.0.8      -      100     [65003, 65002, 65004]       i          |
+|     *       10.0.0.5/32          172.16.0.8      -      100     [65003, 65005]              i          |
+|     *       10.0.0.6/32          172.16.0.8      -      100     [65003, 65005, 65006]       i          |
+|     *       10.0.0.7/32          172.16.0.8      -      100     [65003, 65005, 65100]       i          |
+|     *       10.0.0.45/32         172.16.0.8      -      100     [65003, 65005, 64999]       i          |
++--------------------------------------------------------------------------------------------------------+
+7 received BGP routes : 2 used 7 valid
+----------------------------------------------------------------------------------------------------------
+--{ + running }--[  ]--                                                                                             
+A:rr# /show network-instance default protocols bgp neighbor 172.16.0.10 received-routes ipv4                        
+----------------------------------------------------------------------------------------------------------
+Peer        : 172.16.0.10, remote AS: 65005, local AS: 65001
+Type        : static
+Description : None
+Group       : underlay
+----------------------------------------------------------------------------------------------------------
+Status codes: u=used, *=valid, >=best, x=stale                   
+Origin codes: i=IGP, e=EGP, ?=incomplete                         
++--------------------------------------------------------------------------------------------------------+
+|  Status      Network             Next Hop       MED   LocPref        AsPath              Origin        |
++========================================================================================================+
+|     *       10.0.0.2/32          172.16.0.10     -      100     [65005, 65003, 65002]       i          |
+|     *       10.0.0.3/32          172.16.0.10     -      100     [65005, 65003]              i          |
+|    u*>      10.0.0.4/32          172.16.0.10     -      100     [65005, 65004]              i          |
+|    u*>      10.0.0.5/32          172.16.0.10     -      100     [65005]                     i          |
+|    u*>      10.0.0.6/32          172.16.0.10     -      100     [65005, 65006]              i          |
+|    u*>      10.0.0.7/32          172.16.0.10     -      100     [65005, 65100]              i          |
+|    u*>      10.0.0.45/32         172.16.0.10     -      100     [65005, 64999]              i          |<= used, shorter AS path
++--------------------------------------------------------------------------------------------------------+
+7 received BGP routes : 5 used 7 valid
+```
+Note the difference in AS path length towards the nexthop 10.0.0.45/32; the RR only installs a single next hop (d)
