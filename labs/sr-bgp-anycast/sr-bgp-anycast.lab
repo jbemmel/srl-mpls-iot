@@ -29,10 +29,10 @@ topology:
     srl:
       type: ixrd2
       group: SRL
-      image: ghcr.io/nokia/srlinux
-      # image: srl/auto-config-v2:latest
-      # extras:
-      #  srl-agents: [ ../../../srl-self-organizing/auto-config-agent.yml ]
+      # image: ghcr.io/nokia/srlinux
+      image: srl/anycast-agent:latest
+      extras:
+        srl-agents: [ ../../../ndk-dev-environment/srl-anycast-agent.yml ]
 
 #-----------------------------------------------------#
   nodes:
