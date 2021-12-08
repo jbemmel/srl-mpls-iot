@@ -63,7 +63,7 @@
 / network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
 
 {{- if not .cluster_id }}
-/ network-instance default protocols bgp group RR export-policy reject-all
+/ network-instance default protocols bgp group RR export-policy reject-all next-hop-self true
 {{- range $name, $node := $.clab_nodes }}
   {{- if .cluster_id }}
 / network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
