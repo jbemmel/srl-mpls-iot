@@ -13,14 +13,20 @@
 / network-instance default type default
 / network-instance default interface system0.0
 
+{{/* Configure anycast loopback */}}
+/ interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
+/ network-instance default interface lo0.0
+
 {{/* policy to allow system ip and neighbor loopbacks */}}
 / routing-policy prefix-set system_ips prefix {{ .system_ip }}/32 mask-length-range exact
+/ routing-policy prefix-set system_ips prefix {{ .anycast_ip }}/32 mask-length-range exact
 / routing-policy prefix-set system_ips prefix 10.0.0.0/24 mask-length-range 32..32
-/ routing-policy policy system_ips statement 10 match prefix-set system_ips
-/ routing-policy policy system_ips statement 10 action accept
-/ routing-policy policy system_ips default-action reject
-
-/ routing-policy policy reject-all default-action reject
+/ routing-policy policy underlay_import statement 10 match prefix-set system_ips
+/ routing-policy policy underlay_import statement 10 action accept
+/ routing-policy policy underlay_import default-action reject
+/ routing-policy policy underlay_export statement 10 match prefix-set system_ips
+/ routing-policy policy underlay_export statement 10 action accept
+/ routing-policy policy underlay_export default-action reject
 
 {{/* Underlay Config */}}
 / network-instance default protocols bgp router-id {{ .system_ip }}
@@ -31,7 +37,7 @@
 / network-instance default protocols bgp group underlay timers connect-retry 1
 / network-instance default protocols bgp group underlay timers minimum-advertisement-interval 1
 / network-instance default protocols bgp group underlay ipv4-unicast admin-state enable
-/ network-instance default protocols bgp group underlay import-policy system_ips export-policy system_ips
+/ network-instance default protocols bgp group underlay import-policy underlay_import export-policy underlay_export
 
 {{/* Configure underlay ebgp on links */}}
 {{- range $name, $link := .clab_links -}}
@@ -48,9 +54,13 @@
 / network-instance default static-routes route {{ $.static_route_prefix }} next-hop-group blackhole
 / network-instance default next-hop-groups group blackhole admin-state enable blackhole
 / routing-policy prefix-set system_ips prefix {{ $.static_route_prefix }} mask-length-range exact
-# / routing-policy policy accept-all default-action accept
-# / network-instance default protocols bgp group underlay export-policy accept-all
 {{- end -}}
+
+{{- if $.peer_external }}
+/ routing-policy policy underlay_import statement 20 match prefix-set external_routes
+/ routing-policy policy underlay_import statement 20 action accept
+{{- end -}}
+
 
 {{/* RR Config, unless disabled */}}
 {{- if $.overlay_as }}
@@ -62,19 +72,19 @@
 / network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
 / network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
 
+{{/* All nodes export external prefixes to RR, but next hop self depends */}}
+/ routing-policy policy overlay_export default-action reject
+/ routing-policy policy overlay_export statement 10 match prefix-set external_routes
+/ routing-policy policy overlay_export statement 10 action accept
+/ network-instance default protocols bgp group RR export-policy overlay_export next-hop-self {{ $.next_hop_self }}
+
 {{- if not .cluster_id }}
-/ network-instance default protocols bgp group RR export-policy reject-all next-hop-self true
 {{- range $name, $node := $.clab_nodes }}
   {{- if .cluster_id }}
 / network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
   {{- end -}}
 {{- end -}}
 {{ else }}
-/ routing-policy policy external-routes default-action reject
-/ routing-policy policy external-routes statement 10 match prefix-set external-routes
-/ routing-policy policy external-routes statement 10 action accept
-/ network-instance default protocols bgp group RR export-policy external-routes
-
 / network-instance default protocols bgp group RR route-reflector client true
 / network-instance default protocols bgp group RR route-reflector cluster-id {{ .cluster_id }}
 / network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR
@@ -82,7 +92,7 @@
 
 {{- range $name, $node := $.clab_nodes }}
   {{- if .static_route_prefix }}
-/ routing-policy prefix-set external-routes prefix {{ .static_route_prefix }} mask-length-range exact
+/ routing-policy prefix-set external_routes prefix {{ .static_route_prefix }} mask-length-range exact
   {{- end -}}
 {{- end -}}
 {{- end -}}

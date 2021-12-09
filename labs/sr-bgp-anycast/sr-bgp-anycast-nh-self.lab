@@ -1,13 +1,11 @@
 #
-# Container lab to test 7750 SR BGP Anycast
-#
-# See https://documentation.nokia.com/html/0_add-h-f/93-0267-HTML/7X50_Advanced_Configuration_Guide/BGP_anycast.pdf (from 2011 SROS 9.0R1)
+# Container lab to test BGP Anycast using only SRL nodes
 #
 # Triggered by:
 # - https://blog.ipspace.net/2021/11/anycast-mpls.html
 # - BGP Add Path: https://blog.ipspace.net/2021/12/bgp-multipath-addpath.html
 #
-# Configure: sudo containerlab config -t ./sr-bgp-anycast.lab -l sr-bgp-anycast -p .
+# Configure: sudo containerlab config -t ./sr-bgp-anycast-nh-self.lab -l sr-bgp-anycast -p .
 #
 name: sr-bgp-anycast
 
@@ -17,15 +15,12 @@ topology:
       vars:
         overlay_as: 65000
         anycast_as: 64999 # Must be different
+        anycast_ip: 7.7.7.7
+        next_hop_self: false
 
 #----------------------------------------------------#
   kinds:
-    vr-sros:
-      group: SROS
-      image: vrnetlab/vr-sros:21.10.R1
-      type: sr-1s # integrated single VM
-      license: /Projects/SR_OS_VSR-SIM_license.txt
-
+    # Only 1 kind of nodes, no license file required
     srl:
       type: ixrd2
       group: SRL
@@ -60,20 +55,20 @@ topology:
           as: 65003
 
     c:
-      kind: vr-sros
+      kind: srl # was: vr-sros
       config:
         vars:
           system_ip: 10.0.0.4
           as: 65004
-          anycast_nexthop_ip: self
+          peer_external: true
 
     d:
-      kind: vr-sros
+      kind: srl # was: vr-sros
       config:
         vars:
           system_ip: 10.0.0.5
           as: 65005
-          anycast_nexthop_ip: self
+          peer_external: true
 
     m: # Goal: should get ECMP routes via both C and D
       kind: srl
@@ -97,17 +92,17 @@ topology:
     vars:
       port: [ethernet-1/1,ethernet-1/1]
       clab_link_ip: 172.16.0.0/31
-  - endpoints: ["a:e1-2", "c:eth1"]
+  - endpoints: ["a:e1-2", "c:e1-1"]
     vars:
-      port: [ethernet-1/2,1/1/c1]
+      port: [ethernet-1/2,ethernet-1/1]
       clab_link_ip: 172.16.0.2/31
-  - endpoints: ["b:e1-2", "d:eth1"]
+  - endpoints: ["b:e1-2", "d:e1-1"]
     vars:
-      port: [ethernet-1/2,1/1/c1]
+      port: [ethernet-1/2,ethernet-1/1]
       clab_link_ip: 172.16.0.4/31
-  - endpoints: ["c:eth2", "d:eth2"]
+  - endpoints: ["c:e1-2", "d:e1-2"]
     vars:
-      port: [1/1/c2,1/1/c2]
+      port: [ethernet-1/2,ethernet-1/2]
       clab_link_ip: 172.16.0.6/31
 
 # RR links
@@ -115,27 +110,27 @@ topology:
     vars:
       port: [ethernet-1/3,ethernet-1/1]
       clab_link_ip: 172.16.0.8/31
-  - endpoints: ["d:eth3", "rr:e1-2"]
+  - endpoints: ["d:e1-3", "rr:e1-2"]
     vars:
-      port: [1/1/c3,ethernet-1/2]
+      port: [ethernet-1/3,ethernet-1/2]
       clab_link_ip: 172.16.0.10/31
 
 # M links
-  - endpoints: ["c:eth4", "m:e1-1"]
+  - endpoints: ["c:e1-4", "m:e1-1"]
     vars:
-      port: [1/1/c4,ethernet-1/1]
+      port: [ethernet-1/4,ethernet-1/1]
       clab_link_ip: 172.16.0.12/31
-  - endpoints: ["d:eth4", "m:e1-2"]
+  - endpoints: ["d:e1-4", "m:e1-2"]
     vars:
-      port: [1/1/c4,ethernet-1/2]
+      port: [ethernet-1/4,ethernet-1/2]
       clab_link_ip: 172.16.0.14/31
 
 # Y links (eBGP to external world)
-  - endpoints: ["c:eth5", "y:e1-1"]
+  - endpoints: ["c:e1-5", "y:e1-1"]
     vars:
-      port: [1/1/c5,ethernet-1/1]
+      port: [ethernet-1/5,ethernet-1/1]
       clab_link_ip: 172.16.0.16/31
-  - endpoints: ["d:eth5", "y:e1-2"]
+  - endpoints: ["d:e1-5", "y:e1-2"]
     vars:
-      port: [1/1/c5,ethernet-1/2]
+      port: [ethernet-1/5,ethernet-1/2]
       clab_link_ip: 172.16.0.18/31

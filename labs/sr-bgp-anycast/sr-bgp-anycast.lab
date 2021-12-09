@@ -17,6 +17,7 @@ topology:
       vars:
         overlay_as: 65000
         anycast_as: 64999 # Must be different
+        next_hop_self: true
 
 #----------------------------------------------------#
   kinds:
