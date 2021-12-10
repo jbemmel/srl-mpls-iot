@@ -61,6 +61,7 @@ topology:
           system_ip: 10.0.0.4
           as: 65004
           peer_external: true
+          next_hop_self: true # To make external route acceptable to RR
 
     d:
       kind: srl # was: vr-sros
@@ -69,6 +70,7 @@ topology:
           system_ip: 10.0.0.5
           as: 65005
           peer_external: true
+          next_hop_self: true
 
     m: # Goal: should get ECMP routes via both C and D
       kind: srl

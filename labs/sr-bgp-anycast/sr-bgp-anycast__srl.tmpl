@@ -1,5 +1,5 @@
 {{/* Configure P-to-P interfaces */}}
-
+/system gnmi-server unix-socket admin-state enable
 {{ range $name, $link := .clab_links }}
 {{ if $link.port }}
 / interface {{ $link.port }} subinterface 0 ipv4 address {{ $link.clab_link_ip }}
@@ -12,10 +12,6 @@
 / interface system0 admin-state enable subinterface 0 ipv4 address {{ .system_ip }}/32
 / network-instance default type default
 / network-instance default interface system0.0
-
-{{/* Configure anycast loopback */}}
-/ interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
-/ network-instance default interface lo0.0
 
 {{/* policy to allow system ip and neighbor loopbacks */}}
 / routing-policy prefix-set system_ips prefix {{ .system_ip }}/32 mask-length-range exact
@@ -61,7 +57,6 @@
 / routing-policy policy underlay_import statement 20 action accept
 {{- end -}}
 
-
 {{/* RR Config, unless disabled */}}
 {{- if $.overlay_as }}
 / network-instance default protocols bgp group RR timers connect-retry 1
@@ -79,6 +74,11 @@
 / network-instance default protocols bgp group RR export-policy overlay_export next-hop-self {{ $.next_hop_self }}
 
 {{- if not .cluster_id }}
+
+{{/* Configure anycast loopback, not on RR */}}
+/ interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
+/ network-instance default interface lo0.0
+
 {{- range $name, $node := $.clab_nodes }}
   {{- if .cluster_id }}
 / network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
@@ -87,6 +87,7 @@
 {{ else }}
 / network-instance default protocols bgp group RR route-reflector client true
 / network-instance default protocols bgp group RR route-reflector cluster-id {{ .cluster_id }}
+/ network-instance default protocols bgp group RR import-policy overlay_export
 / network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR
 {{- end -}}
 

@@ -45,6 +45,7 @@ topology:
           system_ip: 10.0.0.1
           cluster_id: 10.10.10.10
           as: 65001
+          next_hop_self: false
 
     a: # Goal: should get C->Y route
       kind: srl
