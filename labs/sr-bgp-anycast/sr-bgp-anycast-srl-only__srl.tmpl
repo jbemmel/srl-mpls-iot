@@ -64,14 +64,17 @@
 {{/* / network-instance default protocols bgp group RR evpn admin-state enable */}}
 / network-instance default protocols bgp group RR ipv4-unicast admin-state enable
 / network-instance default protocols bgp group RR transport local-address {{ .system_ip }}
-/ network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
-/ network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
+# / network-instance default protocols bgp group RR peer-as {{ $.overlay_as }}
+# / network-instance default protocols bgp group RR local-as {{ $.overlay_as }}
 
 {{/* All nodes export external prefixes to RR, but next hop self depends */}}
 / routing-policy policy overlay_export default-action reject
 / routing-policy policy overlay_export statement 10 match prefix-set external_routes
 / routing-policy policy overlay_export statement 10 action accept
-/ network-instance default protocols bgp group RR export-policy overlay_export next-hop-self {{ $.next_hop_self }}
+
+{{/* Make AS path coming from RR as long as external routes */}}
+/ routing-policy policy overlay_import default-action accept bgp as-path prepend
+/ network-instance default protocols bgp group RR import-policy overlay_import export-policy overlay_export next-hop-self false
 
 # / interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
 # / network-instance default interface lo0.0
@@ -84,7 +87,7 @@
 
 {{- range $name, $node := $.clab_nodes }}
   {{- if .cluster_id }}
-/ network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR
+/ network-instance default protocols bgp neighbor {{ $node.system_ip }} peer-group RR peer-as {{ $node.as }}
   {{- end -}}
 {{- end -}}
 {{ else }}
@@ -98,7 +101,9 @@
 / network-instance default protocols bgp group RR route-reflector client true
 / network-instance default protocols bgp group RR route-reflector cluster-id {{ .cluster_id }}
 / network-instance default protocols bgp group RR import-policy overlay_export
-/ network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR
+
+{{/* eBGP here would require 21.11R1 for eBGP multihop, or direct links */}}
+/ network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR allowed-peer-as [ 65002..65006 ]
 {{- end -}}
 
 {{- range $name, $node := $.clab_nodes }}

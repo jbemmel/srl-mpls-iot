@@ -136,3 +136,17 @@ topology:
     vars:
       port: [ethernet-1/5,ethernet-1/2]
       clab_link_ip: 172.16.0.18/31
+
+# Temporary solution until 21.11.R1 with eBGP multihop becomes available
+  - endpoints: ["a:e1-3", "rr:e1-3"]
+    vars:
+      port: [ethernet-1/3,ethernet-1/3]
+      clab_link_ip: 172.16.0.20/31
+  - endpoints: ["c:e1-3", "rr:e1-4"]
+    vars:
+      port: [ethernet-1/3,ethernet-1/4]
+      clab_link_ip: 172.16.0.22/31
+  - endpoints: ["m:e1-3", "rr:e1-5"]
+    vars:
+      port: [ethernet-1/3,ethernet-1/5]
+      clab_link_ip: 172.16.0.24/31
