@@ -55,6 +55,7 @@ topology:
           as: 65003
 
     c:
+      type: ixr6 # For MPLS support
       kind: srl # was: vr-sros
       config:
         vars:
@@ -64,6 +65,7 @@ topology:
           next_hop_self: true # To make external route acceptable to RR
 
     d:
+      type: ixr6 # For MPLS support
       kind: srl # was: vr-sros
       config:
         vars:

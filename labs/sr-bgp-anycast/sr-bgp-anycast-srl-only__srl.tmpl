@@ -72,14 +72,15 @@
 / routing-policy policy overlay_export statement 10 match prefix-set external_routes
 / routing-policy policy overlay_export statement 10 action accept
 
-{{/* Make AS path coming from RR as long as external routes */}}
-/ routing-policy policy overlay_import default-action accept bgp as-path prepend
+/ routing-policy policy overlay_import default-action accept
 / network-instance default protocols bgp group RR import-policy overlay_import export-policy overlay_export next-hop-self false
 
 # / interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
 # / network-instance default interface lo0.0
 
 {{- if not .cluster_id }}
+{{/* Make AS path coming from RR as long as external routes */}}
+/ routing-policy policy overlay_import default-action accept bgp as-path prepend repeat-n 2
 
 {{/* Configure anycast loopback, not on RR? */}}
 # / interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32

@@ -1,5 +1,4 @@
 {{/* Configure P-to-P interfaces */}}
-/system gnmi-server unix-socket admin-state enable
 {{ range $name, $link := .clab_links }}
 {{ if $link.port }}
 / interface {{ $link.port }} subinterface 0 ipv4 address {{ $link.clab_link_ip }}
@@ -15,7 +14,6 @@
 
 {{/* policy to allow system ip and neighbor loopbacks */}}
 / routing-policy prefix-set system_ips prefix {{ .system_ip }}/32 mask-length-range exact
-/ routing-policy prefix-set system_ips prefix {{ .anycast_ip }}/32 mask-length-range exact
 / routing-policy prefix-set system_ips prefix 10.0.0.0/24 mask-length-range 32..32
 / routing-policy policy underlay_import statement 10 match prefix-set system_ips
 / routing-policy policy underlay_import statement 10 action accept
@@ -71,16 +69,8 @@
 / routing-policy policy overlay_export default-action reject
 / routing-policy policy overlay_export statement 10 match prefix-set external_routes
 / routing-policy policy overlay_export statement 10 action accept
-/ network-instance default protocols bgp group RR export-policy overlay_export next-hop-self {{ $.next_hop_self }}
-
-# / interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
-# / network-instance default interface lo0.0
 
 {{- if not .cluster_id }}
-
-{{/* Configure anycast loopback, not on RR? */}}
-# / interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
-# / network-instance default interface lo0.0
 
 {{- range $name, $node := $.clab_nodes }}
   {{- if .cluster_id }}
@@ -88,16 +78,10 @@
   {{- end -}}
 {{- end -}}
 {{ else }}
-{{/* Configure anycast loopback, only on RR? */}}
-/ interface lo0 admin-state enable subinterface 0 ipv4 address {{ .anycast_ip }}/32
-/ network-instance default interface lo0.0
-
-{{/* Make routes sent by RR preferred over local loopbacks */}}
-/ routing-policy policy overlay_export statement 10 action accept bgp local-preference set 101
 
 / network-instance default protocols bgp group RR route-reflector client true
 / network-instance default protocols bgp group RR route-reflector cluster-id {{ .cluster_id }}
-/ network-instance default protocols bgp group RR import-policy overlay_export
+/ network-instance default protocols bgp group RR export-policy overlay_export
 / network-instance default protocols bgp dynamic-neighbors accept match 0.0.0.0/0 peer-group RR
 {{- end -}}
 
