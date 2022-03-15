@@ -16,7 +16,8 @@ topology:
         srl-agents:
         - ../srl-self-organizing/auto-config-agent.yml
         - ../srl-netbox-agent/srl-netbox-agent.yml
-      startup-config: configs/srl-auto.cfg.json
+      # startup-config: configs/srl-auto.cfg.json
+      startup-config: configs/delta-auto-config.cmd
       # binds:
 
     vr-sros:

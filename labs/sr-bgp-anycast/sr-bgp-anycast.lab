@@ -24,7 +24,7 @@ topology:
     vr-sros:
       group: SROS
       image: vrnetlab/vr-sros:21.10.R1
-      type: sr-1s # integrated single VM
+      type: ixr-r6 # sr-1s # integrated single VM
       license: /Projects/SR_OS_VSR-SIM_license.txt
 
     srl:
