@@ -32,6 +32,11 @@ To test, register the local server with Netbox (after creating a token):
 python3 -m netbox_agent.cli --register --netbox.url http://localhost:8000 --netbox.token x --update-all
 ```
 
+There is a script to populate device types:
+```
+scripts/populate_netbox_device_types.py --vendors nokia
+```
+
 ## Adding files to SROS qcow2 image
 For example: a license file or Python packages
 ```
