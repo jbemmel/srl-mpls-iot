@@ -67,7 +67,7 @@ def createDeviceType(deviceTypeName, cards, nb):
                   'manufacturer': nokia.id,
                   'napalm_driver': 'sros', 'napalm_args': { 'insecure': True } } ) # skip_verify not used
 
-    dev_type = nb.dcim.device_types.filter(name=deviceTypeName) # not get
+    dev_type = nb.dcim.device_types.get(slug=slugFormat(deviceTypeName)) # not 'name'
     if not dev_type:
         try:
             dev = {
@@ -81,7 +81,7 @@ def createDeviceType(deviceTypeName, cards, nb):
         except pynetbox.RequestError as e:
             print(e.error)
     else:
-        print( f"device_types.filter(name={deviceTypeName}: {dev_type}" )
+        print( f"device_types.filter(slug={slugFormat(deviceTypeName)}: {dev_type}" )
 
     createInterfaces(1,None,1,'100base-tx',dev_type.id, nb)
     for c in cards:
